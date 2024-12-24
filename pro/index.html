@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechZen: Discover. Learn. Innovate.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+
+        *{
+            cursor:pointer
+        }
+        /* Global Styles */
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #000;
+            color: #E2E8F0;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none; 
+            overflow-x:hidden;
+        }
+        body::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari and Opera */
+}
+
+        /* Navbar */
+        .nav-header {
+    background: rgba(18, 18, 18, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+}
+
+.nav-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    position: relative;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #3a86ff, #ff006e);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: logoGlow 3s ease-in-out infinite;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3a86ff, #ff006e);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.subscribe-btn {
+    background: linear-gradient(45deg, #3a86ff, #ff006e);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.subscribe-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.7s ease;
+}
+
+.subscribe-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(58, 134, 255, 0.4);
+}
+
+.subscribe-btn:hover::before {
+    left: 100%;
+}
+
+
+
+@keyframes logoGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 2px rgba(58, 134, 255, 0.5))
+               drop-shadow(0 0 5px rgba(58, 134, 255, 0.3));
+    }
+    50% {
+        filter: drop-shadow(0 0 5px rgba(58, 134, 255, 0.8))
+               drop-shadow(0 0 10px rgba(58, 134, 255, 0.5));
+    }
+}
+
+
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: #FFF;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 1001;
+    transition: transform 0.3s ease;
+    margin-left: -100px;
+    padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 1rem;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: rgba(18, 18, 18, 0.95);
+        flex-direction: column;
+        padding: 2rem;
+        clip-path: circle(0% at 100% 0);
+        transition: clip-path 0.5s ease-in-out;
+        opacity: 0;
+    }
+
+    .nav-links.active {
+        clip-path: circle(150% at 100% 0);
+        opacity: 1;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+        position: relative;
+        margin-left: -1000px;
+
+    }
+}
+
+        /* Hero Section */
+        .hero {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        45deg,
+        rgba(0, 0, 0, 0.7),
+        rgba(0, 0, 255, 0.3)
+    );
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    padding: 2rem;
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards 0.5s;
+}
+
+.hero-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(45deg, #3a86ff, #ff006e);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInUp 1s ease forwards 1s;
+}
+
+.hero-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.floating-elements {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.floating-element {
+    position: absolute;
+    opacity: 0.6;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+    from {
+        text-shadow: 0 0 10px rgba(58, 134, 255, 0.5),
+                     0 0 20px rgba(58, 134, 255, 0.3),
+                     0 0 30px rgba(58, 134, 255, 0.2);
+    }
+    to {
+        text-shadow: 0 0 20px rgba(58, 134, 255, 0.8),
+                     0 0 40px rgba(58, 134, 255, 0.6),
+                     0 0 60px rgba(58, 134, 255, 0.4);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+        /* Categories */
+/* Categories Section with Background Image */
+.categories {
+    max-width: 1500px;
+    margin: auto;
+    text-align: center;
+    position: relative;
+    background: url("img-vid/catback2.png") no-repeat center center fixed;
+    background-size: cover;
+    padding: 6rem 2rem;
+    color: #fff;
+    margin-top: revert;
+    perspective: 1px;
+    transform-style: preserve-3d;
+}
+
+/* Optional: To improve text visibility over the background image */
+.categories::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.6) 100%
+    );
+    z-index: -1;
+}
+
+
+.categories h2 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+    position: relative;
+    z-index: 2;
+    padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .category-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .categories {
+        padding: 4rem 1rem;
+    }
+}
+
+        @keyframes emergeFromCorners {
+        0% {
+            transform: translate(-200%, -200%) scale(0.5); /* Top-left corner */
+            opacity: 0;
+        }
+        100% {
+            transform: translate(0, 0) scale(1); /* Final position */
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.category-grid > * {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+
+.category-grid > *:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.category-grid > *:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+    /* Apply animation to category cards */
+    .category-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    background: rgba(17, 13, 13, 0.85);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.category-card:hover {
+    transform: translateY(-10px) rotateX(10deg);
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.2),
+        0 0 20px rgba(255, 0, 110, 0.3),
+        0 0 40px rgba(58, 134, 255, 0.2);
+    cursor: pointer;
+}
+
+.category-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, #ff006e, #3a86ff, #00f5d4);
+    border-radius: 22px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: borderGlow 3s linear infinite;
+}
+
+.category-card:hover::before {
+    opacity: 1;
+}
+
+
+
+    /* Active class to start animation */
+    .category-card.active {
+        animation: emergeFromCorners 1.5s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+    }
+
+    /* Delay animations for each card */
+    .category-card.active:nth-child(1) {
+        animation-delay: 0.3s;
+    }
+    .category-card.active:nth-child(2) {
+        animation-delay: 0.6s;
+    }
+    .category-card.active:nth-child(3) {
+        animation-delay: 0.9s;
+    }
+
+    /* Hover effect */
+
+
+/* Particle Effect */
+.category-card::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes borderGlow {
+    0%, 100% {
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+        .category-card img {
+            max-width: 100%;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+        }
+
+        .category-card h3 {
+            margin: 1rem 0;
+            color: #06B6D4;
+        }
+
+        .category-card p {
+            color: #f9f9f9;
+        }
+
+        /* Latest News */
+        .latest-news {
+    max-width: 1500px;
+    margin: auto;
+    text-align: center;
+    position: relative;
+    background: url("img-vid/catback2.png") no-repeat center center fixed;
+    background-size: cover;
+    padding: 6rem 2rem;
+    color: #fff;
+    perspective: 1px;
+    transform-style: preserve-3d;
+}
+
+.latest-news::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.6) 100%
+    );
+    z-index: 1;
+}
+
+.news-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.news-card {
+    opacity: 0;
+    transform: translate(-200%, -200%) scale(0.5);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(17, 13, 13, 0.85);
+    border-radius: 20px;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    animation: emergeFromCorners 1.5s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+    animation-play-state: paused;
+    padding:5rem;
+}
+
+.news-card.active {
+    animation-play-state: running;
+}
+
+/* Delay animations for each card */
+.news-card:nth-child(1) {
+    animation-delay: 0.3s;
+}
+.news-card:nth-child(2) {
+    animation-delay: 0.6s;
+}
+.news-card:nth-child(3) {
+    animation-delay: 0.9s;
+}
+
+@keyframes emergeFromCorners {
+    0% {
+        transform: translate(-200%, -200%) scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+}
+
+.news-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.news-content {
+    transition: transform 0.3s ease;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: scale(0.3);
+        filter: hue-rotate(180deg);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: hue-rotate(0deg);
+    }
+}
+
+.news-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, #ff006e, #3a86ff, #00f5d4);
+    border-radius: 22px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: borderGlow 3s linear infinite;
+}
+
+.news-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.news-card:hover::before {
+    opacity: 1;
+}
+
+.news-card:hover::after {
+    opacity: 0.5;
+}
+
+@keyframes borderGlow {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(360deg); }
+}
+
+.news-content {
+    transform: translateZ(60px);
+    transition: transform 0.5s ease;
+}
+
+.news-card:hover .news-content {
+    transform: translateZ(80px);
+}
+
+.news-card img {
+    max-width: 400px;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            margin-left: -80px;
+}
+
+.news-card:hover img {
+    transform: scale(1.05);
+}
+
+.latest-news h2 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.news-tag {
+    background: linear-gradient(45deg, #ff006e, #3a86ff);
+    animation: tagPulse 2s infinite;
+}
+
+@keyframes tagPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 0, 110, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 0, 110, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 0, 110, 0); }
+}
+
+.read-more {
+    position: relative;
+    overflow: hidden;
+}
+
+.read-more::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: -100%;
+    background: #06b6d4;
+    transition: left 0.3s ease;
+}
+
+.read-more:hover::before {
+    left: 0;
+}
+
+@media (max-width: 768px) {
+    .news-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+        /* Footer */
+        .footer {
+    background: linear-gradient(to right, #0f0f0f, #1a1a1a);
+    color: #E2E8F0;
+    padding: 4rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #3a86ff, transparent);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
+}
+
+.footer-section {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.footer-section h3 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.footer-section h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 40px;
+    height: 2px;
+    background: #3a86ff;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.social-link:hover {
+    transform: translateY(-5px);
+    background: #3a86ff;
+}
+
+.social-link img {
+    width: 20px;
+    height: 20px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-links a {
+    color: #E2E8F0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #3a86ff;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 1rem;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.newsletter-form button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    background: #3a86ff;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.newsletter-form button:hover {
+    transform: translateY(-2px);
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .newsletter-form {
+        flex-direction: column;
+    }
+}
+
+        .cursor {
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: transform 0.2s;
+}
+
+.cursor-follower {
+    width: 30px;
+    height: 30px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+    mix-blend-mode: difference;
+}
+
+/* Add this to category-card hover state */
+.category-card:hover ~ .cursor-follower {
+    transform: scale(3);
+    border-color: rgba(255,255,255,0.1);
+}
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="nav-header">
+        <div class="nav-container">
+            <a href="/" class="logo">TechZen</a>
+            <nav class="nav-links">
+                <a href="news.html">Tech News</a>
+                <a href="gadgets.html">Gadgets</a>
+                <a href="/ai.html">AI Updates</a>
+                <a href="/reviews.html">Reviews</a>
+                <button class="subscribe-btn">Subscribe</button>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i  class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <video class="hero-video" autoplay loop muted>
+            <source src="img-vid/backvid2.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">TechZen</h1>
+            <p class="hero-subtitle">Discover. Learn. Innovate.</p>
+            <button class="hero-btn">Get Started</button>
+        </div>
+        <div class="floating-elements"></div>
+    </section>
+    
+<div class="divider"></div>
+
+
+    <!-- Categories -->
+    <section class="categories">
+        <h2>Explore Tech Topics</h2>
+        <div class="category-grid">
+            <a href="ai.html" class="category-card">
+                <img src="img-vid/ai.png" alt="AI Updates">
+                <h3>AI Updates</h3>
+                <p>Latest developments in artificial intelligence and machine learning</p>
+            </a>
+            <a href="gadgets.html" class="category-card">
+                <img src="img-vid/gadgets.png" alt="Gadget Reviews">
+                <h3>Gadget Reviews</h3>
+                <p>In-depth reviews of the latest tech gadgets and innovations</p>
+            </a>
+            <a href="news.html" class="category-card">
+                <img style="max-width: 350px; margin-left: -23px; margin-top: 15px; margin-bottom: 50px;" src="img-vid/tech.png" alt="Tech News">
+                <h3>Tech News</h3>
+                <p>Breaking news and updates from the tech industry</p>
+            </a>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Latest News -->
+    <section class="latest-news">
+        <h2>Latest News</h2>
+        <div class="news-grid">
+            <div class="news-card">
+                <img src="img-vid/ainews.png" alt="AI News">
+                <div class="news-content">
+                    <span class="news-tag">AI & ML</span>
+                    <h3>Latest AI Breakthroughs</h3>
+                    <p>Exploring recent developments in artificial intelligence and their impact on various industries.</p>
+                    <a href="ai.html" class="read-more">Read More <span>&rarr;</span></a>
+                </div>
+            </div>
+            <div class="news-card">
+                <img src="img-vid/robots.png" alt="Robotics">
+                <div class="news-content">
+                    <span class="news-tag">Robotics</span>
+                    <h3>Future of Robotics</h3>
+                    <p>Discover the latest advancements in robotics and automation technology.</p>
+                    <a href="robots.html" class="read-more">Read More <span>&rarr;</span></a>
+                </div>
+            </div>
+            <div class="news-card">
+                <img src="img-vid/web3.png" alt="Web3">
+                <div class="news-content">
+                    <span class="news-tag">Web3</span>
+                    <h3>Web3 Revolution</h3>
+                    <p>Understanding the impact of blockchain and decentralized technologies.</p>
+                    <a href="web3.html" class="read-more">Read More <span>&rarr;</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>TechZen</h3>
+                <p>Your daily source for the latest in technology, innovation, and digital transformation.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><img src="img-vid/facebook.png" alt="Facebook"></a>
+                    <a href="#" class="social-link"><img src="img-vid/twitter.png" alt="Twitter"></a>
+                    <a href="#" class="social-link"><img src="img-vid/linkedin.png" alt="LinkedIn"></a>
+                    <a href="#" class="social-link"><img src="img-vid/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+    
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Stay updated with our latest tech news</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TechZen. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+                // Mobile menu toggle functionality
+// Mobile menu toggle functionality
+const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+const navLinks = document.querySelector('.nav-links');
+
+mobileMenuBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+});
+
+// Combined observer for both sections
+const sectionObserverOptions = {
+    root: null,
+    threshold: 0.1
+};
+
+const sectionObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            // Check if it's the categories section
+            if (entry.target.classList.contains('categories')) {
+                const categoryCards = entry.target.querySelectorAll('.category-card');
+                categoryCards.forEach(card => card.classList.add('active'));
+            }
+            
+            // Check if it's the news section
+            if (entry.target.classList.contains('latest-news')) {
+                const newsCards = entry.target.querySelectorAll('.news-card');
+                newsCards.forEach(card => card.classList.add('active'));
+            }
+
+            // Unobserve once the animation is triggered
+            observer.unobserve(entry.target);
+        }
+    });
+}, sectionObserverOptions);
+
+// Observe both sections
+document.querySelectorAll('.categories, .latest-news').forEach(section => {
+    sectionObserver.observe(section);
+});
+
+
+    const newsSection = {
+    init() {
+        // Initialize intersection observer
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            },
+            { threshold: 0.2 }
+        );
+
+        // Observe news cards
+        document.querySelectorAll('.news-card').forEach(card => {
+            observer.observe(card);
+            this.addHoverEffect(card);
+        });
+    },
+
+    addHoverEffect(card) {
+        let bounds;
+        let mouseLeaveDelay;
+
+        const mouseMove = (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const leftX = mouseX - bounds.x;
+            const topY = mouseY - bounds.y;
+            const center = {
+                x: leftX - bounds.width / 2,
+                y: topY - bounds.height / 2
+            };
+            
+            const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
+            
+            card.style.transform = `
+                perspective(1000px)
+                scale3d(1.07, 1.07, 1.07)
+                rotate3d(
+                    ${center.y / 100},
+                    ${-center.x / 100},
+                    0,
+                    ${Math.log(distance) * 2}deg
+                )
+            `;
+            
+            card.querySelector('.news-content').style.transform = `
+                translate3d(${center.x * 0.1}px, ${center.y * 0.1}px, 0)
+            `;
+        };
+
+        const mouseEnter = () => {
+            bounds = card.getBoundingClientRect();
+            document.addEventListener('mousemove', mouseMove);
+            clearTimeout(mouseLeaveDelay);
+        };
+
+        const mouseLeave = () => {
+            document.removeEventListener('mousemove', mouseMove);
+            mouseLeaveDelay = setTimeout(() => {
+                card.style.transform = '';
+                card.querySelector('.news-content').style.transform = '';
+            }, 100);
+        };
+
+        card.addEventListener('mouseenter', mouseEnter);
+        card.addEventListener('mouseleave', mouseLeave);
+    }
+};
+
+// Initialize on document load
+document.addEventListener('DOMContentLoaded', () => {
+    newsSection.init();
+});
+
+    document.querySelectorAll('.news-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const deltaX = (x - centerX) / centerX;
+        const deltaY = (y - centerY) / centerY;
+        
+        card.style.transform = `
+            perspective(1000px) 
+            rotateX(${deltaY * 10}deg) 
+            rotateY(${deltaX * 10}deg)
+            translateZ(20px)
+        `;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+    });
+});
+
+    // Observe the categories section
+    const categoriesSection = document.querySelector('.categories');
+    observer.observe(categoriesSection);
+
+
+    document.querySelectorAll('.category-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const deltaX = (x - centerX) / centerX;
+        const deltaY = (y - centerY) / centerY;
+        
+        card.style.transform = `perspective(1000px) rotateX(${deltaY * 10}deg) rotateY(${deltaX * 10}deg) translateZ(20px)`;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const hero = document.querySelector('.hero');
+    
+    // Create floating elements
+    for(let i = 0; i < 20; i++) {
+        const element = document.createElement('div');
+        element.className = 'floating-element';
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.top = `${Math.random() * 100}%`;
+        element.style.animationDelay = `${Math.random() * 5}s`;
+        hero.appendChild(element);
+    }
+
+    // Parallax effect
+    window.addEventListener('scroll', () => {
+        const scroll = window.pageYOffset;
+        document.querySelector('.hero-content').style.transform = `translateY(${scroll * 0.5}px)`;
+        document.querySelector('.hero-video').style.transform = `translateY(${scroll * 0.15}px)`;
+    });
+});
+
+
+
+// Particle System
+const particleSystem = {
+    particles: [],
+    init() {
+        const canvas = document.createElement('canvas');
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = '1';
+        document.body.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Create particles
+        for(let i = 0; i < 50; i++) {
+            this.particles.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 5 + 1,
+                speedX: Math.random() * 3 - 1.5,
+                speedY: Math.random() * 3 - 1.5
+            });
+        }
+        
+        // Animation loop
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            this.particles.forEach(particle => {
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+                
+                if(particle.x < 0 || particle.x > window.innerWidth) 
+                    particle.speedX *= -1;
+                if(particle.y < 0 || particle.y > window.innerHeight)
+                    particle.speedY *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fill();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+};
+
+// Initialize Custom Cursor
+function initCustomCursor() {
+    const cursor = document.createElement('div');
+    const follower = document.createElement('div');
+    
+    cursor.classList.add('cursor');
+    follower.classList.add('cursor-follower');
+    
+    document.body.appendChild(cursor);
+    document.body.appendChild(follower);
+    
+    let mouseX = 0;
+    let mouseY = 0;
+    let followerX = 0;
+    let followerY = 0;
+    
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    });
+    
+    function followCursor() {
+        let diffX = mouseX - followerX;
+        let diffY = mouseY - followerY;
+        
+        followerX += diffX * 0.1;
+        followerY += diffY * 0.1;
+        
+        follower.style.transform = `translate3d(${followerX}px, ${followerY}px, 0)`;
+        requestAnimationFrame(followCursor);
+    }
+
+    followCursor();
+    
+    // Add hover effect for interactive elements
+    const interactiveElements = document.querySelectorAll('a, button, .category-card');
+    interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            follower.style.width = '50px';
+            follower.style.height = '50px';
+        });
+        el.addEventListener('mouseleave', () => {
+            follower.style.width = '30px';
+            follower.style.height = '30px';
+        });
+    });
+}
+
+// Call the function when DOM is loaded
+document.addEventListener('DOMContentLoaded', initCustomCursor);
+
+// Magnetic Effect with Spring Physics
+class MagneticButton {
+    constructor(el) {
+        this.el = el;
+        this.bound = el.getBoundingClientRect();
+        this.x = 0;
+        this.y = 0;
+        this.spring = { x: 0, y: 0 };
+        this.friction = 0.8;
+        this.tension = 0.6;
+        
+        this.animate = this.animate.bind(this);
+        requestAnimationFrame(this.animate);
+        
+        this.el.addEventListener('mousemove', e => this.onMouseMove(e));
+        this.el.addEventListener('mouseleave', () => this.onMouseLeave());
+    }
+    
+    onMouseMove(e) {
+        const x = e.clientX - this.bound.left - this.bound.width / 2;
+        const y = e.clientY - this.bound.top - this.bound.height / 2;
+        this.x = x * 0.5;
+        this.y = y * 0.5;
+    }
+    
+    onMouseLeave() {
+        this.x = 0;
+        this.y = 0;
+    }
+    
+    animate() {
+        const dx = this.x - this.spring.x;
+        const dy = this.y - this.spring.y;
+        
+        this.spring.x += dx * this.tension;
+        this.spring.y += dy * this.tension;
+        
+        this.spring.x *= this.friction;
+        this.spring.y *= this.friction;
+        
+        this.el.style.transform = `translate3d(${this.spring.x}px, ${this.spring.y}px, 0)`;
+        requestAnimationFrame(this.animate);
+    }
+}
+
+// Initialize everything
+document.addEventListener('DOMContentLoaded', () => {
+    particleSystem.init();
+    cursor.init();
+    document.querySelectorAll('.category-card').forEach(el => new MagneticButton(el));
+});
+    </script>
+</body>
+</html>

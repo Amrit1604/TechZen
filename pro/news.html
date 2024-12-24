@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TechWatch - Latest Technology News</title>
+    <style>
+        /* News Page Specific Styles */
+        .news-hero {
+            background-color: #F1F3FE;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .news-hero h1 {
+            color: #091E80;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .news-filters {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-button {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #091E80;
+            border-radius: 20px;
+            background: none;
+            color: #091E80;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-button:hover,
+        .filter-button.active {
+            background: #091E80;
+            color: white;
+        }
+
+        .featured-article {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .featured-article img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .featured-content {
+            padding: 2rem;
+        }
+
+        .article-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .news-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .featured-article {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the header -->
+    <div id="header"></div>
+
+    <!-- News Hero Section -->
+    <section class="news-hero">
+        <h1>Latest Technology News</h1>
+        <p>Stay informed with the latest breakthroughs, updates, and innovations in tech</p>
+    </section>
+
+    <!-- News Filters -->
+    <section class="news-filters">
+        <div class="filter-buttons">
+            <button class="filter-button active">All News</button>
+            <button class="filter-button">Industry Updates</button>
+            <button class="filter-button">Innovation</button>
+            <button class="filter-button">Startups</button>
+            <button class="filter-button">Research</button>
+        </div>
+    </section>
+
+    <!-- Featured Article -->
+    <article class="featured-article">
+        <div class="featured-content">
+            <div class="article-meta">
+                <span>December 24, 2024</span> • <span>5 min read</span>
+            </div>
+            <h2>Revolutionary Quantum Computing Breakthrough</h2>
+            <p>Scientists have achieved a major milestone in quantum computing, demonstrating practical quantum supremacy in a real-world application for the first time...</p>
+            <button class="read-more">Read Full Article →</button>
+        </div>
+        <img src="quantum-computing.jpg" alt="Quantum Computing Illustration">
+    </article>
+
+    <!-- News Grid -->
+    <section class="news-grid">
+        <!-- News Cards will be dynamically populated -->
+    </section>
+
+    <script>
+        // Load the header
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header').innerHTML = data;
+            });
+
+        // Sample news data
+        const newsArticles = [
+            {
+                title: "AI Models Show Unprecedented Language Understanding",
+                excerpt: "New developments in natural language processing push the boundaries...",
+                date: "December 24, 2024",
+                readTime: "4 min read",
+                category: "Innovation"
+            },
+            // Add more articles
+        ];
+
+        // Populate news grid
+        const newsGrid = document.querySelector('.news-grid');
+        newsArticles.forEach(article => {
+            const card = document.createElement('div');
+            card.className = 'news-card';
+            card.innerHTML = `
+                <div class="news-content">
+                    <div class="article-meta">
+                        <span>${article.date}</span> • <span>${article.readTime}</span>
+                    </div>
+                    <h3>${article.title}</h3>
+                    <p>${article.excerpt}</p>
+                    <a href="#">Read More →</a>
+                </div>
+            `;
+            newsGrid.appendChild(card);
+        });
+
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-button');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                // Filter logic would go here
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TechWatch - Gadget Reviews</title>
+    <style>
+        .gadgets-hero {
+            background: linear-gradient(111.08deg, #091E80 1.49%, #3254F1 96.65%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .category-tabs {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 1rem 2rem;
+            background: #F1F3FE;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-tab:hover,
+        .category-tab.active {
+            background: #091E80;
+            color: white;
+        }
+
+        .featured-gadget {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #F1F3FE;
+            border-radius: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .gadget-image {
+            position: relative;
+        }
+
+        .gadget-image img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .rating-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #091E80;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .gadget-specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .spec-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .reviews-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .featured-gadget {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the header -->
+    <div id="header"></div>
+
+    <!-- Gadgets Hero Section -->
+    <section class="gadgets-hero">
+        <h1>Expert Gadget Reviews</h1>
+        <p>Comprehensive reviews and comparisons of the latest tech gadgets</p>
+    </section>
+
+    <!-- Category Tabs -->
+    <div class="category-tabs">
+        <div class="category-tab active">Smartphones</div>
+        <div class="category-tab">Laptops</div>
+        <div class="category-tab">Wearables</div>
+        <div class="category-tab">Smart Home</div>
+    </div>
+
+    <!-- Featured Gadget Review -->
+    <section class="featured-gadget">
+        <div class="gadget-image">
+            <img src="latest-smartphone.jpg" alt="Latest Smartphone">
+            <div class="rating-badge">9.5/10</div>
+        </div>
+        <div class="gadget-content">
+            <h2>Latest Flagship Smartphone Review</h2>
+            <div class="gadget-specs">
+                <div class="spec-item">
+                    <h4>Performance</h4>
+                    <p>Industry-leading processor with advanced AI capabilities</p>
+                </div>
+                <div class="spec-item">
+                    <h4>Camera</h4>
+                    <p>Revolutionary camera system with 8K video capability</p>
+                </div>
+                <div class="spec-item">
+                    <h4>Battery</h4>
+                    <p>All-day battery life with fast charging support</p>
+                </div>
+                <div class="spec-item">
+                    <h4>Display</h4>
+                    <p>Cutting-edge AMOLED display with 120Hz refresh rate</p>
+                </div>
+            </div>
+            <button class="read-more">Read Full Review →</button>
+        </div>
+    </section>
+
+    <!-- Reviews Grid -->
+    <section class="reviews-grid">
+        <!-- Review cards will be dynamically populated -->
+    </section>
+
+    <script>
+        // Load the header
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header').innerHTML = data;
+            });
+
+        // Category tab functionality
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                // Filter reviews based on category
+            });
+        });
+
+        // Sample reviews data
+        const reviews = [
+            {
+                title: "Next-Gen Gaming Laptop",
+                rating: "9.2/10",
+                excerpt: "Revolutionary gaming performance in a slim package...",
+                pros: ["Exceptional performance", "Beautiful display", "Great battery life"],
+                cons: ["Premium price", "Fans can get loud"]
+            },
+            // Add more reviews
+        ];
+
+        // Populate reviews grid
+        const reviewsGrid = document.querySelector('.reviews-grid');
+        reviews.forEach(review => {
+            const card = document.createElement('div');
+            card.className = 'review-card';
+            card.innerHTML = `
+                <h3>${review.title}</h3>
+                <div class="rating">${review.rating}</div>
+                <p>${review.excerpt}</p>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Pros:</h4>
+                        <ul>${review.pros.map(pro => `<li>${pro}</li>`).join('')}</ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Cons:</h4>
+                        <ul>${review.cons.map(con => `<li>${con}</li>`).join('')}</ul>
+                    </div>
+                </div>
+            `;
+            reviewsGrid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
