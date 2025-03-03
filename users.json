@@ -1,0 +1,48 @@
+{
+  "Amrit1": "1d7589e192f91daa0257317ffa32348e4ce64b032a87eda7539ff831fa5eb221",
+  "test": "1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014",
+  "Amrit2": {
+    "email": "amritjoshi2004@gmail.com",
+    "password": "623ad701ca6afad6b8ff8a0e7fcf432c70110c2f31ddd6573154dac0729b0a0c"
+  },
+  "Pranjal": {
+    "email": "pranjaljoshi2009@gmail.com",
+    "password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+  },
+  "Pranjal1": {
+    "email": "pranjaljoshi2009@gmail.com",
+    "hash": "fe644011449805c4f6a6169974bcf49b3326f4219b2a8f189efba3bc29709260536acf8c5c5aceef8ad2b2bdf16b36b5f6722048bb49ec1fcbfc75935cc757e3",
+    "salt": "5c493cd5ca1f8567e6f4261fdb3297a8",
+    "password": "password123"
+  },
+  "Joshi": {
+    "email": "yoyo12345@gmail.com",
+    "hash": "45e4f5139e21e6e8d23587392d8efea8569ec05cd11b08e37fc724dfd3cfc1af51083d4fe77d5638019718b91ce0c74113f6b87f08876ca92af6f4b640a6a053",
+    "salt": "fae7d87acd686ac96578b8fca5568a29",
+    "password": "joshi123"
+  },
+  "hulk": {
+    "email": "hulk@gmail.com",
+    "password": "Yoyoyo12345"
+  },
+  "Man": {
+    "email": "man@gmail.com",
+    "password": "Yoman123"
+  },
+  "Ekansh": {
+    "email": "ekanshdhiman123@gmail.com",
+    "password": "Kaka123#"
+  },
+  "test2": {
+    "email": "yoyo12345@gmail.com",
+    "password": "Test123@"
+  },
+  "newtest": {
+    "email": "newtest@gmail.com",
+    "password": "Newtest123"
+  },
+  "ekansh": {
+    "email": "ekanshdhiman200@gmail.com",
+    "password": "@Ekansh07"
+  }
+}

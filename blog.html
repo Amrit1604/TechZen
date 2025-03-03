@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wardiere Inc. - Blog</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #1a1033;
+            color: white;
+        }
+
+        .sign-up-btn {
+            background-color: white;
+            color: #1a1033;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 5%;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .blog-card {
+            background-color: #2a1f4d;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .blog-content {
+            padding: 1.5rem;
+        }
+
+        .tag {
+            background-color: #6e57b2;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .date {
+            color: #a99fd6;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .read-more {
+            color: #a99fd6;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .read-more:hover {
+            color: white;
+        }
+        /* Navbar */
+        .nav-header {
+        background: rgba(18, 18, 18, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-sizing: border-box;
+        }
+        
+        .nav-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1rem;
+        position: relative;
+        }
+        
+        .logo {
+        font-size: 1.8rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, #3a86ff, #ff006e);
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: logoGlow 3s ease-in-out infinite;
+        }
+        
+        .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        }
+        
+        .nav-links a {
+        color: #fff;
+        text-decoration: none;
+        position: relative;
+        padding: 0.5rem 0;
+        }
+        
+        .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #3a86ff, #ff006e);
+        transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+        width: 100%;
+        }
+        
+        .subscribe-btn {
+        background: linear-gradient(45deg, #3a86ff, #ff006e);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        }
+        
+        .subscribe-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+        );
+        transition: left 0.7s ease;
+        }
+        
+        .subscribe-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(58, 134, 255, 0.4);
+        }
+        
+        .subscribe-btn:hover::before {
+        left: 100%;
+        }
+        
+        
+        
+        @keyframes logoGlow {
+        0%, 100% {
+        filter: drop-shadow(0 0 2px rgba(58, 134, 255, 0.5))
+               drop-shadow(0 0 5px rgba(58, 134, 255, 0.3));
+        }
+        50% {
+        filter: drop-shadow(0 0 5px rgba(58, 134, 255, 0.8))
+               drop-shadow(0 0 10px rgba(58, 134, 255, 0.5));
+        }
+        }
+
+        .logout-btn {
+    position: relative;
+    background: linear-gradient(90deg,#ff006e, #3a86ff);
+    color: white;
+    border: none;
+    padding: 11px 30px;  /* Increased size */
+    border-radius: 30px;  /* Slightly rounded corners */
+    font-size: 16px;  /* Larger font */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.logout-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+.logout-btn:hover {
+    background: #0056b3;  /* Darker blue for hover */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(58, 134, 255, 0.4);
+}
+
+.logout-btn:hover::before {
+    left: 100%;  /* Gradient effect on hover */
+}
+
+@keyframes logoGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 2px rgba(58, 134, 255, 0.5)) drop-shadow(0 0 5px rgba(58, 134, 255, 0.3));
+    }
+    50% {
+        filter: drop-shadow(0 0 5px rgba(58, 134, 255, 0.8)) drop-shadow(0 0 10px rgba(58, 134, 255, 0.5));
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+        
+        
+        .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: #FFF;
+        font-size: 2rem;
+        cursor: pointer;
+        z-index: 1001;
+        transition: transform 0.3s ease;
+        margin-left: -100px;
+        padding: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+        .nav-container {
+        padding: 0 1rem;
+        }
+        
+        .nav-links {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: rgba(18, 18, 18, 0.95);
+        flex-direction: column;
+        padding: 2rem;
+        clip-path: circle(0% at 100% 0);
+        transition: clip-path 0.5s ease-in-out;
+        opacity: 0;
+        }
+        
+        .nav-links.active {
+        clip-path: circle(150% at 100% 0);
+        opacity: 1;
+        }
+        
+        .mobile-menu-btn {
+        display: block;
+        position: relative;
+        margin-left: -1000px;
+        
+        }
+        }
+
+        /* Footer */
+.footer {
+background: linear-gradient(to right, #0f0f0f, #1a1a1a);
+color: #E2E8F0;
+padding: 4rem 2rem 2rem;
+position: relative;
+overflow: hidden;
+}
+
+.footer::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 1px;
+background: linear-gradient(90deg, transparent, #3a86ff, transparent);
+}
+
+.footer-content {
+max-width: 1200px;
+margin: 0 auto;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 3rem;
+}
+
+.footer-section {
+animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.footer-section h3 {
+color: #fff;
+font-size: 1.5rem;
+margin-bottom: 1.5rem;
+position: relative;
+}
+
+.footer-section h3::after {
+content: '';
+position: absolute;
+left: 0;
+bottom: -8px;
+width: 40px;
+height: 2px;
+background: #3a86ff;
+}
+
+.social-links {
+display: flex;
+gap: 1rem;
+margin-top: 1.5rem;
+}
+
+.social-link {
+width: 40px;
+height: 40px;
+border-radius: 50%;
+background: rgba(255,255,255,0.1);
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.social-link:hover {
+transform: translateY(-5px);
+background: #3a86ff;
+}
+
+.social-link img {
+width: 20px;
+height: 20px;
+}
+
+.footer-links {
+list-style: none;
+padding: 0;
+}
+
+.footer-links li {
+margin-bottom: 0.8rem;
+}
+
+.footer-links a {
+color: #E2E8F0;
+text-decoration: none;
+transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+color: #3a86ff;
+}
+
+.newsletter-form {
+display: flex;
+gap: 1rem;
+}
+
+.newsletter-form input {
+flex: 1;
+padding: 0.8rem;
+border: none;
+border-radius: 5px;
+background: rgba(255,255,255,0.1);
+color: #fff;
+}
+
+.newsletter-form button {
+padding: 0.8rem 1.5rem;
+border: none;
+border-radius: 5px;
+background: #3a86ff;
+color: #fff;
+cursor: pointer;
+transition: transform 0.3s ease;
+}
+
+.newsletter-form button:hover {
+transform: translateY(-2px);
+}
+
+.footer-bottom {
+text-align: center;
+margin-top: 3rem;
+padding-top: 2rem;
+border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+@media (max-width: 768px) {
+.footer-content {
+grid-template-columns: 1fr;
+}
+
+.newsletter-form {
+flex-direction: column;
+}
+}
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+
+.social-icons {
+    margin-top: 10px;
+}
+
+.social-icons a {
+    color: #000;
+    margin: 0 10px;
+    font-size: 24px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #0073e6; /* Change this color to whatever you prefer */
+}
+
+    </style>
+</head>
+<body>
+   <!-- Navbar -->
+   <header class="nav-header">
+    <div class="nav-container">
+        <a href="/" class="logo">TechZen</a>
+        <nav class="nav-links">
+            <a href="news.html">Tech News</a>
+            <a href="gadgets.html">Gadgets</a>
+            <a href="ai.html">AI Updates</a>
+            <a href="reviews.html">Reviews</a>
+            <button class="subscribe-btn">Subscribe</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+                          </nav>
+        <button class="mobile-menu-btn">
+            <i  class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+
+    <div class="container">
+        <h1>Read the Blog</h1>
+
+        <div class="blog-grid">
+            <div class="blog-card">
+                <img src="https://www.webprecious.com/wp-content/uploads/2024/05/Types-of-AI.jpg" alt="WFH" class="blog-image">
+                <div class="blog-content">
+                    <span class="tag">#trends</span>
+                    <div class="date">July 22, 2028</div>
+                    <h2 class="blog-title">WFH's the New Normal</h2>
+                    <a href="#" class="read-more">Read full post →</a>
+                </div>
+            </div>
+
+            <div class="blog-card">
+                <img src="https://undetectable.ai/blog/wp-content/uploads/2024/11/most-common-type-of-ai-used.jpg" alt="Company News" class="blog-image">
+                <div class="blog-content">
+                    <span class="tag">#news</span>
+                    <div class="date">July 15, 2028</div>
+                    <h2 class="blog-title">What's New with the Company</h2>
+                    <a href="#" class="read-more">Read full post →</a>
+                </div>
+            </div>
+
+            <div class="blog-card">
+                <img src="https://vofox.com/wp-content/uploads/2024/12/different-types-of-AI-in-2025.png" alt="AI Implementation" class="blog-image">
+                <div class="blog-content">
+                    <span class="tag">#trends</span>
+                    <div class="date">July 08, 2028</div>
+                    <h2 class="blog-title">How to Implement AI Into Your Work</h2>
+                    <a href="#" class="read-more">Read full post →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Add hover effect to blog cards
+            $('.blog-card').hover(
+                function() {
+                    $(this).css('cursor', 'pointer');
+                },
+                function() {
+                    $(this).css('cursor', 'default');
+                }
+            );
+
+            // Handle card click
+            $('.blog-card').click(function() {
+                const title = $(this).find('.blog-title').text();
+                console.log(Opening blog post: ${title});
+                // Add your navigation logic here
+            });
+
+            // Smooth scroll for navigation links
+            $('a[href^="#"]').click(function(e) {
+                e.preventDefault();
+                const target = $(this.hash);
+                if (target.length) {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top
+                    }, 500);
+                }
+            });
+        });
+    </script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>TechZen</h3>
+                <p>Your daily source for the latest in technology, innovation, and digital transformation.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><img src="img-vid/facebook.png" alt="Facebook"></a>
+                    <a href="#" class="social-link"><img src="img-vid/twitter.png" alt="Twitter"></a>
+                    <a href="#" class="social-link"><img src="img-vid/linkedin.png" alt="LinkedIn"></a>
+                    <a href="#" class="social-link"><img src="img-vid/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+    
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Stay updated with our latest tech news</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TechZen. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

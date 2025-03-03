@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechZen - Gadget Reviews</title>
+    <link rel="stylesheet" href="stylegad.css">
+
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="nav-header">
+        <div class="nav-container">
+            <a href="/" class="logo">TechZen</a>
+            <nav class="nav-links">
+                <a href="news.html">Tech News</a>
+                <a href="gadgets.html">Gadgets</a>
+                <a href="ai.html">AI Updates</a>
+                <a href="reviews.html">Reviews</a>
+                <button class="subscribe-btn">Subscribe</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+                              </nav>
+            <button class="mobile-menu-btn">
+                <i  class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+
+    <div id="header"></div>
+
+    <section class="gadgets-hero">
+        <h1 class="neon-text">Expert Gadget Reviews</h1>
+        <p>Comprehensive reviews and comparisons of the latest tech gadgets</p>
+    </section>
+
+    <div class="category-tabs">
+        <div class="category-tab active" data-category="smartphones">Smartphones</div>
+        <div class="category-tab" data-category="laptops">Laptops</div>
+        <div class="category-tab" data-category="wearables">Wearables</div>
+        <div class="category-tab" data-category="smartHome">Smart Home</div>
+    </div>  
+
+    <section class="gadgets-grid" id="gadgets-grid">
+        <div class="gadget-image">
+            <img src="" alt="Featured Gadget">
+            <div class="rating-badge"></div>
+            <div class="search-container">
+                <input type="text" id="gadget-search" placeholder="Search gadgets..." aria-label="Search gadgets">
+                <button id="search-btn">🔍</button>
+            </div>
+        </div>
+        <div class="gadget-content">
+            <h2 id="gadget-name" class="neon-text"></h2>
+            <div class="gadget-specs" id="gadget-specs"></div>
+            <button class="read-more">Read Full Review →</button>
+        </div>
+    </section>
+
+    <div class="modal" id="gadget-modal">
+        <div class="modal-content">
+            <div class="close-modal" onclick="closeModal()">×</div>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <section class="reviews-grid" id="reviews-grid">
+        <!-- Review cards will be dynamically populated -->
+    </section>
+
+    <script>
+        const gadgets = {
+        smartphones: {
+            category: "Smartphones",
+            devices: [
+                {
+                    id: "iphone15",
+                    name: "iPhone 15 Pro",
+                    image: "https://iplanet.one/cdn/shop/files/iPhone_15_Pink_PDP_Image_Position-5__en-IN_3fc22fb7-fe05-426a-82e4-8eaa0f7a67cc.jpg?v=1695428231&width=823",
+                    rating: "9.5/10",
+                    price: "$999",
+                    quickSpecs: ["A17 Pro chip", "48MP Camera", "6.1\" OLED"],
+                    specs: [
+                        { title: "Performance", description: "A17 Pro chip with 6-core CPU" },
+                        { title: "Camera", description: "48MP main, 12MP ultra-wide" },
+                        { title: "Battery", description: "Up to 23 hours video playback" },
+                        { title: "Display", description: "6.1\" Super Retina XDR" }
+                    ],
+                    reviews: [
+                        { title: "Amazing Camera", rating: 5, review: "Incredible night mode photos" },
+                        { title: "Great Battery", rating: 4, review: "Lasts all day easily" }
+                    ]
+                },
+                {
+                    id: "s23ultra",
+                    name: "Samsung Galaxy S23 Ultra",
+                    image: "https://images.samsung.com/in/smartphones/galaxy-s23-ultra/images/galaxy-s23-ultra-highlights-kv.jpg",
+                    rating: "9.4/10",
+                    price: "$1199",
+                    quickSpecs: ["200MP Camera", "S Pen", "6.8\" AMOLED"],
+                    specs: [
+                        { title: "Performance", description: "Snapdragon 8 Gen 2" },
+                        { title: "Camera", description: "200MP main, 10MP telephoto" },
+                        { title: "Battery", description: "5000mAh with 45W charging" },
+                        { title: "Display", description: "6.8\" Dynamic AMOLED 2X" }
+                    ],
+                    reviews: [
+                        { title: "Perfect Package", rating: 5, review: "Best Android experience" },
+                        { title: "Amazing Display", rating: 5, review: "Stunning screen quality" }
+                    ]
+                },
+                {
+                    id: "pixel8pro",
+                    name: "Google Pixel 8 Pro",
+                    image: "https://www.91-cdn.com/hub/wp-content/uploads/2023/09/google-pixel-8-pro-camera-feat-1200x900.jpg",
+                    rating: "9.3/10",
+                    price: "$999",
+                    quickSpecs: ["Tensor G3", "50MP Camera", "6.7\" LTPO"],
+                    specs: [
+                        { title: "Performance", description: "Google Tensor G3" },
+                        { title: "Camera", description: "50MP main, 48MP ultra-wide" },
+                        { title: "Battery", description: "5050mAh with 23W charging" },
+                        { title: "Display", description: "6.7\" LTPO OLED" }
+                    ],
+                    reviews: [
+                        { title: "AI Features", rating: 5, review: "Amazing AI capabilities" },
+                        { title: "Clean Android", rating: 5, review: "Pure Android experience" }
+                    ]
+                }
+            ]
+        },
+        laptops: {
+            category: "Laptops",
+            devices: [
+                {
+                    id: "macbookpro",
+                    name: "MacBook Pro 14\" M3",
+                    image: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/mbp14-spacegray-select-202310?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1697311054290",
+                    rating: "9.6/10",
+                    price: "$1599",
+                    quickSpecs: ["M3 Pro chip", "14\" Liquid Retina XDR", "18hr battery"],
+                    specs: [
+                        { title: "Performance", description: "M3 Pro with 11‑core CPU" },
+                        { title: "Display", description: "14.2\" Liquid Retina XDR" },
+                        { title: "Battery", description: "Up to 18 hours" },
+                        { title: "Storage", description: "512GB to 8TB SSD" }
+                    ],
+                    reviews: [
+                        { title: "Powerhouse", rating: 5, review: "Incredible performance" },
+                        { title: "Perfect Display", rating: 5, review: "Best-in-class screen" }
+                    ]
+                },
+                {
+                    id: "zenbook",
+                    name: "Asus Zenbook S13 OLED",
+                    image: "https://cdn.mall.adeptmind.ai/https%3A%2F%2Fmultimedia.bbycastatic.ca%2Fmultimedia%2Fproducts%2F500x500%2F169%2F16941%2F16941723_4.jpg_large.webp",
+                    rating: "9.2/10",
+                    price: "$1299",
+                    quickSpecs: ["Intel Core i7", "13.3\" OLED", "1kg weight"],
+                    specs: [
+                        { title: "Performance", description: "Intel Core i7-1355U" },
+                        { title: "Display", description: "13.3\" 2.8K OLED" },
+                        { title: "Battery", description: "Up to 14 hours" },
+                        { title: "Weight", description: "1kg ultra-light" }
+                    ],
+                    reviews: [
+                        { title: "Ultra Portable", rating: 5, review: "Perfect for travel" },
+                        { title: "Great Screen", rating: 5, review: "Vibrant OLED display" }
+                    ]
+                }
+                // Add more laptops similarly
+            ]
+        },
+
+        wearables: {
+        category: "Wearables",
+        devices: [
+            {
+                id: "applewatch",
+                name: "Apple Watch Ultra",
+                image: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/ultra-case-unselect-gallery-1-202409_GEO_IN_FMT_WHH?wid=752&hei=720&fmt=p-jpg&qlt=80&.v=1725399347133",
+                rating: "9.7/10",
+                price: "$799",
+                quickSpecs: ["Ultra-strong titanium case", "GPS + Cellular", "36-hour battery life"],
+                specs: [
+                    { title: "Design", description: "Titanium case with sapphire crystal" },
+                    { title: "Display", description: "2-inch OLED Retina display" },
+                    { title: "Battery", description: "Up to 36 hours of battery life" },
+                    { title: "Features", description: "Track fitness, health, and outdoor activities" }
+                ],
+                reviews: [
+                    { title: "Durable and Stylish", rating: 5, review: "Perfect for outdoor enthusiasts" },
+                    { title: "Amazing Performance", rating: 5, review: "Works flawlessly even in harsh conditions" }
+                ]
+            },
+            {
+                id: "galaxywatch",
+                name: "Samsung Galaxy Watch 6",
+                image: "https://img.global.news.samsung.com/global/wp-content/uploads/2023/07/UNPK_Watch6-PR_main1.jpg",
+                rating: "9.5/10",
+                price: "$350",
+                quickSpecs: ["Super AMOLED display", "Sleep tracking", "Blood pressure monitoring"],
+                specs: [
+                    { title: "Display", description: "1.5-inch Super AMOLED screen" },
+                    { title: "Battery", description: "Up to 40 hours of battery life" },
+                    { title: "Health", description: "Heart rate, ECG, blood pressure monitoring" }
+                ],
+                reviews: [
+                    { title: "Feature-packed", rating: 5, review: "Great health tracking features" },
+                    { title: "Stylish Design", rating: 4, review: "Sleek and functional" }
+                ]
+            },
+            {
+                id: "garminvenu",
+                name: "Garmin Venu 2",
+                image: "https://www.zdnet.com/a/img/2022/01/03/cb085875-a385-4c8e-81b1-7e51618fe8d7/venu-2-plus-group-shot.jpg",
+                rating: "9.3/10",
+                price: "$399",
+                quickSpecs: ["GPS, Music Storage", "Corning Gorilla Glass 3", "Smart notifications"],
+                specs: [
+                    { title: "Display", description: "1.3-inch AMOLED touchscreen" },
+                    { title: "Battery", description: "Up to 11 days in smartwatch mode" },
+                    { title: "Tracking", description: "Health and fitness tracking" }
+                ],
+                reviews: [
+                    { title: "Solid Performance", rating: 5, review: "Ideal for athletes and fitness enthusiasts" },
+                    { title: "Amazing Screen", rating: 4, review: "Vivid display under sunlight" }
+                ]
+            }
+        ]
+    },
+    smartHome: {
+        category: "Smart Home",
+        devices: [
+            {
+                id: "nestthermostat",
+                name: "Google Nest Learning Thermostat",
+                image: "https://www.alliantenergymarketplace.com/dw/image/v2/BDDP_PRD/on/demandware.static/-/Sites-masterCatalog/default/dw73aa8ca1/Products/I-NST3RDGEN-01-STST-XXXX-V1.jpg?sw=800&sh=800",
+                rating: "9.6/10",
+                price: "$249",
+                quickSpecs: ["Learning AI", "Wi-Fi Connectivity", "Voice-controlled"],
+                specs: [
+                    { title: "Design", description: "Sleek and modern design with a circular display" },
+                    { title: "Connectivity", description: "Works with Wi-Fi and voice assistants" },
+                    { title: "Energy", description: "Energy-efficient and learns your schedule" }
+                ],
+                reviews: [
+                    { title: "Smart and Efficient", rating: 5, review: "Saves energy and is easy to use" },
+                    { title: "Voice Control", rating: 4, review: "Works well with Google Assistant" }
+                ]
+            },
+            {
+                id: "philipsbulb",
+                name: "Philips Hue White and Color Ambiance Bulb",
+                image: "https://www.igan-iluminacion.com/43812-zoom_producto/philips-starter-kit-hue-led-bulbs-e27-a60-bridge-switch.jpg",
+                rating: "9.4/10",
+                price: "$49.99",
+                quickSpecs: ["16 million colors", "Smart control", "Energy efficient"],
+                specs: [
+                    { title: "Smart Features", description: "Compatible with Alexa, Google Assistant" },
+                    { title: "Lighting", description: "16 million colors and white tones" },
+                    { title: "Power", description: "Low energy consumption" }
+                ],
+                reviews: [
+                    { title: "Great Customization", rating: 5, review: "A huge variety of colors" },
+                    { title: "Easy Setup", rating: 4, review: "Quick installation and control" }
+                ]
+            },
+            {
+                id: "ringdoorbell",
+                name: "Ring Video Doorbell Pro 2",
+                image: "https://images.ctfassets.net/a3peezndovsu/variant-32148466565209/3697f5fdaadc9ae3945b76e62b7b7608/variant-32148466565209.jpg",
+                rating: "9.8/10",
+                price: "$249",
+                quickSpecs: ["1080p HD video", "Two-way audio", "Motion-activated alerts"],
+                specs: [
+                    { title: "Camera", description: "1080p HD video with HDR" },
+                    { title: "Audio", description: "Two-way audio with noise cancellation" },
+                    { title: "Features", description: "Motion detection and instant alerts" }
+                ],
+                reviews: [
+                    { title: "Excellent Security", rating: 5, review: "Reliable and clear video quality" },
+                    { title: "Easy to Use", rating: 5, review: "Simple installation and control" }
+                ]
+            }
+        ]
+    }
+        // Add more categories similarly
+    };
+
+    // Function to update grid content
+    function updateGridContent(category) {
+        const gridContainer = document.getElementById('gadgets-grid');
+        gridContainer.innerHTML = '';
+        
+        gadgets[category].devices.forEach(device => {
+            const card = document.createElement('div');
+            card.classList.add('gadget-card');
+            card.onclick = () => showDeviceModal(device);
+            
+            card.innerHTML = `
+                <img src="${device.image}" alt="${device.name}">
+                <div class="gadget-card-content">
+                    <h3 class="gadget-card-title">${device.name}</h3>
+                    <span class="gadget-card-rating">${device.rating}</span>
+                    <div class="gadget-card-price">${device.price}</div>
+                    <div class="quick-specs">
+                        ${device.quickSpecs.map(spec => `• ${spec}`).join('<br>')}
+                    </div>
+                </div>
+            `;
+            
+            gridContainer.appendChild(card);
+        });
+    }
+
+    // Function to show device modal
+    function showDeviceModal(device) {
+        const modal = document.getElementById('gadget-modal');
+        const modalContent = document.getElementById('modal-content');
+        
+        modalContent.innerHTML = `
+            <h2 class="neon-text">${device.name}</h2>
+            <div class="gadget-specs">
+                ${device.specs.map(spec => `
+                    <div class="spec-item">
+                        <h4>${spec.title}</h4>
+                        <p>${spec.description}</p>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="reviews-grid">
+                ${device.reviews.map(review => `
+                    <div class="review-card">
+                        <h3>${review.title}</h3>
+                        <div class="rating">
+                            ${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}
+                        </div>
+                        <p>${review.review}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+    }
+
+    // Function to close modal
+    function closeModal() {
+        document.getElementById('gadget-modal').style.display = 'none';
+    }
+
+    // Initialize with smartphones
+    window.addEventListener('DOMContentLoaded', () => {
+        updateGridContent('smartphones');
+    });
+
+// Category tab functionality
+const categoryTabs = document.querySelectorAll('.category-tab'); // Add this line
+
+categoryTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        categoryTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        updateGridContent(tab.dataset.category);
+    });
+});
+
+
+    // Search functionality
+    document.getElementById('search-btn').addEventListener('click', () => {
+        const searchTerm = document.getElementById('gadget-search').value.toLowerCase().trim();
+        if (searchTerm) {
+            for (const [category, data] of Object.entries(gadgets)) {
+                const matchingDevice = data.devices.find(device => 
+                    device.name.toLowerCase().includes(searchTerm)
+                );
+                if (matchingDevice) {
+                    const categoryTab = Array.from(categoryTabs).find(
+                        tab => tab.dataset.category === category
+                    );
+                    categoryTab.click();
+                    setTimeout(() => showDeviceModal(matchingDevice), 100);
+                    break;
+                }
+            }
+        }
+    });
+
+    // Close modal when clicking outside
+    window.onclick = (event) => {
+        const modal = document.getElementById('gadget-modal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+    </script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>TechZen</h3>
+                <p>Your daily source for the latest in technology, innovation, and digital transformation.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><img src="img-vid/facebook.png" alt="Facebook"></a>
+                    <a href="#" class="social-link"><img src="img-vid/twitter.png" alt="Twitter"></a>
+                    <a href="#" class="social-link"><img src="img-vid/linkedin.png" alt="LinkedIn"></a>
+                    <a href="#" class="social-link"><img src="img-vid/instagram.png" alt="Instagram"></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+    
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Stay updated with our latest tech news</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TechZen. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

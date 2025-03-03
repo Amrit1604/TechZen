@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="stylelog.css">
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --card-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255,107,107,0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #ff5252;
+        }
+
+        .message {
+            padding: 10px 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .toggle-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 25px 15px;
+            }
+            .form-title {
+                font-size: 20px;
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container">
+            <div class="card">
+                <h2 class="form-title" id="formTitle">Login</h2>
+                <form id="authForm">
+                    <div class="form-group">
+                        <input type="text" id="username" required placeholder="Username">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" required placeholder="Password">
+                        <button type="button" id="passwordToggle" class="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <span id="submitText">Login</span>
+                    </button>
+                </form>
+                <div class="toggle-text" id="toggleText">
+                    Don't have an account? <a href="#" id="toggleLink">Sign Up</a>
+                </div>
+                <div id="message" class="message"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    // Essential DOM elements
+    const authForm = document.getElementById('authForm');
+    const formTitle = document.getElementById('formTitle');
+    const submitText = document.getElementById('submitText');
+    const toggleLink = document.getElementById('toggleLink');
+    const passwordInput = document.getElementById('password');
+    const passwordToggle = document.getElementById('passwordToggle');
+    const messageDiv = document.getElementById('message');
+    let isLogin = true;
+    
+    // Password visibility toggle
+    passwordToggle.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        passwordToggle.innerHTML = type === 'password' ? 
+            '<i class="fas fa-eye"></i>' : 
+            '<i class="fas fa-eye-slash"></i>';
+    });
+    
+    // Update toggle function
+    toggleLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        isLogin = !isLogin;
+        
+        // Keep message visible if it's a success message from signup
+        const currentMessage = messageDiv.textContent;
+        const isSuccessMessage = messageDiv.classList.contains('success');
+        
+        formTitle.textContent = isLogin ? 'Login' : 'Sign Up';
+        submitText.textContent = isLogin ? 'Login' : 'Sign Up';
+        toggleText.innerHTML = isLogin ? 
+            'Don\'t have an account? <a href="#" id="toggleLink">Sign Up</a>' : 
+            'Already have an account? <a href="#" id="toggleLink">Login</a>';
+        
+        // Only reset form and hide message if it's not a success message
+        if (!isSuccessMessage) {
+            authForm.reset();
+            messageDiv.style.display = 'none';
+        }
+    });
+    
+    // Message display
+    function showMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+        
+        // Only auto-hide error messages
+        if (type === 'error') {
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+    
+    // Update form submission handler
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+    
+        try {
+            const endpoint = isLogin ? '/api/login' : '/api/signup';
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value.trim(),
+                    password: document.getElementById('password').value
+                })
+            });
+    
+            const data = await response.json();
+            
+            if (response.ok) {
+                showMessage(isLogin ? 'Login successful!' : 'Account created successfully!', 'success');
+                
+                if (!isLogin) {
+                    // Wait for message to be visible before toggling
+                    setTimeout(() => {
+                        isLogin = true;
+                        formTitle.textContent = 'Login';
+                        submitText.textContent = 'Login';
+                        toggleText.innerHTML = 'Don\'t have an account? <a href="#" id="toggleLink">Sign Up</a>';
+                        authForm.reset();
+                    }, 1500);
+                }
+                
+                if (data.redirect) {
+                    setTimeout(() => window.location.href = data.redirect, 2000);
+                }
+            } else {
+                showMessage(data.message || 'An error occurred', 'error');
+            }
+        } catch (error) {
+            showMessage('Network error occurred', 'error');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+    </script>
+</body>
+</html>
