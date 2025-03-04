@@ -1,0 +1,18 @@
+[
+  {
+    "id": "23d5fdea-f28f-4e6a-9ce8-1986775242c1",
+    "name": "Ekansh",
+    "email": "ekansh123@gmail.com",
+    "password": "$2a$10$Fnxcx5TXdagoLN5/enIx3umByZe9gTijWtiqPZbOhqfFe/nsaCf8m",
+    "accountType": "seller",
+    "createdAt": "2025-03-04T03:58:15.618Z"
+  },
+  {
+    "id": "91473389-9904-4e7d-b723-169de3d6f14b",
+    "name": "Amrit Joshi",
+    "email": "amrit2004@gmail.com",
+    "password": "$2a$10$WoDkk7HKdwDO4XaT3pShW.4PIQvimIlZfjb8OVUP9cO/QqepeKvAe",
+    "accountType": "buyer",
+    "createdAt": "2025-03-04T04:00:50.161Z"
+  }
+]

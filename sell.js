@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs');
 
 // Initialize express app
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // Configure middleware
 app.use(express.static(path.join(__dirname, 'public')));

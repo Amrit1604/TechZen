@@ -160,5 +160,36 @@
     "date": "2025-03-03T17:24:11.861Z",
     "id": "370b538f-63bb-4496-8dea-dd834838b09e",
     "updatedAt": "2025-03-03T17:24:11.861Z"
+  },
+  {
+    "user": "91473389-9904-4e7d-b723-169de3d6f14b",
+    "items": [
+      {
+        "id": "c898b200-e24a-4881-86ee-73f344044e0a",
+        "name": "Amrit",
+        "price": 111,
+        "image": "/uploads/1741060763285-ea27af7c-d3ae-43f8-9ac9-c21a20c2d43b.jpeg",
+        "quantity": 1
+      }
+    ],
+    "shipping": {
+      "name": "Amrit Joshi",
+      "address": "62-A, guru nanak enclave, gate number 1, dhakoli",
+      "city": "dhakoli",
+      "zip": "160104",
+      "country": "India",
+      "phone": "09501580144"
+    },
+    "payment": {
+      "method": "paypal",
+      "total": 134.88,
+      "subtotal": 111,
+      "tax": 8.88,
+      "shipping": 15
+    },
+    "status": "processing",
+    "date": "2025-03-04T04:01:08.907Z",
+    "id": "8140b32b-efed-40cb-a40d-5db6243b1a12",
+    "updatedAt": "2025-03-04T04:01:08.907Z"
   }
 ]

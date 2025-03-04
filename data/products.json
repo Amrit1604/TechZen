@@ -88,5 +88,23 @@
     },
     "createdAt": "2025-03-03T16:54:55.314Z",
     "updatedAt": "2025-03-03T16:54:55.314Z"
+  },
+  {
+    "id": "c898b200-e24a-4881-86ee-73f344044e0a",
+    "name": "Amrit",
+    "description": "good boy",
+    "category": "accessories",
+    "condition": "used",
+    "price": 111,
+    "quantity": 2,
+    "images": [
+      "/uploads/1741060763285-ea27af7c-d3ae-43f8-9ac9-c21a20c2d43b.jpeg"
+    ],
+    "seller": {
+      "id": "23d5fdea-f28f-4e6a-9ce8-1986775242c1",
+      "name": "Ekansh"
+    },
+    "createdAt": "2025-03-04T03:59:23.397Z",
+    "updatedAt": "2025-03-04T03:59:23.397Z"
   }
 ]

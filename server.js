@@ -3,15 +3,6 @@ const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
 const fs = require('fs');
-const bodyParser = require('body-parser'); 
-const session = require('express-session');
-
-const app = express();
-
-
-// In server.js
-const sellRoutes = require('./routes/sellRoutes');
-app.use('/selling', sellRoutes);
 
 
 require('dotenv').config();  // Add this line to load .env variables
@@ -25,28 +16,9 @@ if (!fs.existsSync(USERS_FILE)) {
 
 const sessions = new Map();
 
+const app = express();
 
 
-
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-    secret: 'techzen-marketplace-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
-}));
-
-// Use the sell routes
-app.use('/selling', sellRoutes);
-
-// Error handling
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).json({ message: err.message || 'Something went wrong' });
-});
 
 
 
@@ -95,6 +67,7 @@ const mimeTypes = {
 const routes = {
     '/': 'index.html',
     '/login': 'login.html',
+    '/ContactUs' : 'ContactUs.html',
     '/home': 'home.html',
     '/ai': 'ai.html',
     '/news': 'news.html',
@@ -102,7 +75,6 @@ const routes = {
     '/subscribe': 'subscribe.html',
     '/blogs': 'blogs.html',
     '/customer': 'customer.html',
-    '/selling' : 'selling.html',
 };
 
 const server = http.createServer((req, res) => {
@@ -110,7 +82,7 @@ const server = http.createServer((req, res) => {
         const cookies = parseCookies(req.headers.cookie);
         const sessionId = cookies.sessionId;
 
-        if (['/home', '/ai', '/news', '/gadgets', '/subscribe' ,'/customer', '/blogs', '/selling' ].includes(req.url)) {
+        if (['/home', '/ai', '/news', '/gadgets', '/subscribe' ,'/customer', '/blogs' ].includes(req.url)) {
             if (!sessionId || !sessions.has(sessionId)) {
                 res.writeHead(302, { 'Location': '/login' });
                 res.end();
