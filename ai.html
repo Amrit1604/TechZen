@@ -4,9 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Launch Tracker Pro | TechZen Suite</title>
+    <script src="loader.js"></script>
+<script>
+    // Initialize loader before anything else loads
+    (function() {
+        initLoader('ai');
+    })();
+</script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <style>
+
         :root {
             --primary-color: #2563eb;
             --secondary-color: #1e40af;
@@ -28,115 +37,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .loader-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--background-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s;
-            perspective: 1000px;
-        }
 
-        .loader-content {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            transform-style: preserve-3d;
-            animation: rotate 2s infinite linear;
-        }
-
-        .loader-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 4px solid transparent;
-            border-top: 4px solid var(--primary-color);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .loader-ring:nth-child(1) {
-            transform: rotateX(60deg) rotateY(0deg);
-            border-top-color: #2563eb;
-        }
-
-        .loader-ring:nth-child(2) {
-            transform: rotateX(120deg) rotateY(60deg);
-            border-top-color: #10b981;
-        }
-
-        .loader-ring:nth-child(3) {
-            transform: rotateX(180deg) rotateY(120deg);
-            border-top-color: #8b5cf6;
-        }
-
-        .loader-sphere {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle at 30% 30%, #ffffff, var(--techzen-accent));
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 20px var(--techzen-accent);
-            animation: pulse-sphere 1s ease-in-out infinite alternate;
-        }
-
-        .loader-text {
-            position: absolute;
-            top: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--text-color);
-            font-size: 1.5rem;
-            font-weight: bold;
-            white-space: nowrap;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            animation: glow 1.5s ease-in-out infinite alternate;
-        }
-
-        .loader-particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--techzen-accent);
-            border-radius: 50%;
-            animation: particle-float 2s infinite linear;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
-            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
-        }
-
-        @keyframes pulse-sphere {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
-        }
-
-        @keyframes glow {
-            0% { text-shadow: 0 0 5px var(--techzen-accent), 0 0 10px var(--techzen-accent); }
-            100% { text-shadow: 0 0 10px var(--techzen-accent), 0 0 20px var(--techzen-accent); }
-        }
-
-        @keyframes particle-float {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-        }
 
         /* Navbar Styles */
         .navbar {
@@ -1139,25 +1040,17 @@
     }
 }
     </style>
+
+
 </head>
 <body>
-    <!-- Loader -->
-    <div class="loader-container" id="loader">
-        <div class="loader-content">
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <div class="loader-sphere"></div>
-            <div class="loader-particles" id="particles"></div>
-        </div>
-        <div class="loader-text">Initializing TechZen AI</div>
-    </div>
+
 
     <div id="background"></div>
 
     <!-- Navbar -->
     <nav class="navbar">
-        <a href="#" class="nav-logo">
+        <a href="/home" class="nav-logo">
             <i class="fas fa-rocket"></i>
             AI Launch Tracker <span class="logo-highlight">Pro</span>
         </a>

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="TechZen customer support chat - Get instant help with technical issues">
+    <link rel="icon" type="image/png" href="favicon.png">
     <title>TechZen- Tech Support</title>
     <style>
 :root {
@@ -439,6 +441,15 @@ button:hover {
     }
 }
 
+.back-button {
+    background-color: #ef4444;
+
+}
+
+.back-button:hover {
+    background: #4b5563;
+}
+
     </style>
 </head>
 <body>
@@ -458,8 +469,11 @@ button:hover {
                     <label>Issue</label>
                     <textarea id="issue" placeholder="Describe your issue" rows="4" required></textarea>
                 </div>
-                <button id="start-chat">Start Chat</button>
+                <button id="start-chat">Start Chat</button> <br> <br> <br>
+                <button id="back-to-home" class="back-button">Back to Home</button>
+
             </div>
+            
         </div>
 
         <div class="screen chat-screen">
@@ -498,6 +512,13 @@ button:hover {
 
     <script src="socket.io/socket.io.js"></script>
     <script>
+
+        /* filepath: /C:/Users/Amrit Joshi/OneDrive/Desktop/backendpro/customer.html */
+// Back button handler - add this inside your DOMContentLoaded event listener
+document.querySelector('#back-to-home').addEventListener('click', function() {
+    window.location.href = '/home'; // Assuming your home page is index.html
+});
+
         let userInfo = {};
         let chatEnded = false;
 

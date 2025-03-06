@@ -21,7 +21,7 @@
 
     <header class="header" id="header" data-header>
         <a href="/" class="logo">
-            <img src="logo.jpeg" alt="TECHZEN">
+            <img src="img-vid/logo.jpeg" alt="TECHZEN">
         </a>
     </header>
 
@@ -212,40 +212,48 @@
             }
         });
     
-        // Login form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const submitButton = this.querySelector('button[type="submit"]');
-            
-            addLoadingState(submitButton);
-            
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    document.getElementById('loginSuccess').style.display = 'block';
-                    setTimeout(() => {
-                        window.location.href = data.redirect;
-                    }, 1000);
-                } else {
-                    document.getElementById('loginPasswordError').textContent = 'Invalid username or password';
-                    document.getElementById('loginPasswordError').style.display = 'block';
-                }
-            } catch (error) {
-                alert('Connection error. Please try again.');
-            } finally {
-                removeLoadingState(submitButton, 'Sign In');
+// Login form submission
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    addLoadingState(submitButton);
+    
+    try {
+        const response = await fetch('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+});
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Remember me functionality
+            if (document.getElementById('rememberMe').checked) {
+                localStorage.setItem('rememberedUser', JSON.stringify({ username, password }));
             }
-        });
+            
+            document.getElementById('loginSuccess').style.display = 'block';
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 1000);
+        } else {
+            document.getElementById('loginPasswordError').textContent = 'Invalid username or password';
+            document.getElementById('loginPasswordError').style.display = 'block';
+        }
+    } catch (error) {
+        alert('Connection error. Please try again.');
+    } finally {
+        removeLoadingState(submitButton, 'Sign In');
+    }
+});
+
+
+
     
         // Panel switch animation
         signUpButton.addEventListener('click', () => container.classList.add("right-panel-active"));

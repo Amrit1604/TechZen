@@ -1,218 +1,182 @@
+const express = require('express');
 const http = require('http');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const socketIO = require('socket.io');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();  // Add this line to load .env variables
-const API_KEY = process.env.API_KEY;
+const setupCustomerSockets = require('./customer.js');
+const sellRouter = require('./sell.js');
 
-const USERS_FILE = path.join(__dirname, 'users.json');
-if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify({}));
-}
+// Import our new route modules
+const aiRoutes = require('./routes/ai');
+const { router, sessions } = require('./routes/auth');
+require('dotenv').config();
 
-const sessions = new Map();
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 
+// Middleware setup (correct order is important)
+app.use(express.json());  // Make sure this is added
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
+// Session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+    store: new FileStore({
+        path: './sessions',
+        ttl: 86400
+    })
+}));
 
+// Request logger middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
 
+// Static File Serving - Moved this BEFORE the route definitions to ensure static files are served properly
+app.use(express.static(__dirname));
 
-function readUsers() {
+// Make sure uploads directory is served statically
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Mount the routers
+app.use('/api', sellRouter);
+app.use('/api/auth', router);
+app.use('/api', aiRoutes);
+
+// Utility Functions
+function saveUserData(userData) {
+    const filePath = path.join(__dirname, 'userdata.json');
+    let existingData = [];
+    
+    if (fs.existsSync(filePath)) {
+        try {
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+            existingData = JSON.parse(fileContent);
+        } catch (error) {
+            console.error('Error reading existing data:', error);
+        }
+    }
+
+    const newData = {
+        ...userData,
+        timestamp: new Date().toISOString()
+    };
+    existingData.push(newData);
+
     try {
-        return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
+        console.log('User data saved successfully');
     } catch (error) {
-        console.error('Error reading users file:', error);
-        return {};
+        console.error('Error saving user data:', error);
     }
 }
 
-function writeUsers(users) {
-    try {
-        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-    } catch (error) {
-        console.error('Error writing users file:', error);
-    }
-}
-
-function parseCookies(cookieHeader) {
-    const cookies = {};
-    if (cookieHeader) {
-        cookieHeader.split(';').forEach(cookie => {
-            const [name, value] = cookie.split('=');
-            cookies[name.trim()] = value;
-        });
-    }
-    return cookies;
-}
-
-function generateSessionId() {
-    return Math.random().toString(36).substring(2) + Date.now().toString(36);
-}
-
-const mimeTypes = {
-    '.html': 'text/html',
-    '.css': 'text/css',
-    '.js': 'text/javascript',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.mp4': 'video/mp4',
-    '.ico': 'image/x-icon',
-};
-
+// Routes
 const routes = {
     '/': 'index.html',
     '/login': 'login.html',
+    '/ContactUs': 'ContactUs.html',
     '/home': 'home.html',
     '/ai': 'ai.html',
     '/news': 'news.html',
-    '/gadgets': 'gadgets.html',
+    '/gadgets': 'gadget.html',
     '/subscribe': 'subscribe.html',
+    '/blogs': 'blog.html',
+    '/customer': 'customer.html',
+    '/admin': 'admin1604.html',
+    '/chatbot': 'chatbot.html',
+    '/about': 'AboutUs.html',
+    '/selling': 'selling.html',
 };
 
-const server = http.createServer((req, res) => {
-    if (req.method === 'GET') {
-        const cookies = parseCookies(req.headers.cookie);
-        const sessionId = cookies.sessionId;
+// Ensure the uploads directory exists
+const uploadDir = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-        if (['/home', '/ai', '/news', '/gadgets', '/subscribe'].includes(req.url)) {
-            if (!sessionId || !sessions.has(sessionId)) {
-                res.writeHead(302, { 'Location': '/login' });
-                res.end();
-                return;
-            }
+// Ensure users.json exists
+const usersFilePath = path.join(__dirname, 'users.json'); // Fixed path
+if (!fs.existsSync(usersFilePath)) {
+    try {
+        fs.writeFileSync(usersFilePath, JSON.stringify({ _lastCheck: new Date().toISOString() }, null, 2));
+        console.log('Created empty users.json file');
+    } catch (error) {
+        console.error('Error creating users.json file:', error);
+    }
+}
+
+// Middleware to check authentication for protected routes
+// Fixed to use sessions from auth.js
+const protectedRoutes = ['/home', '/ai', '/news', '/gadgets', '/subscribe', '/customer', '/chatbot'];
+app.use((req, res, next) => {
+    if (protectedRoutes.includes(req.path)) {
+        const sessionId = req.cookies.sessionId;
+        console.log(`Route ${req.path} access attempted with sessionId: ${sessionId}`);
+        
+        if (sessionId) {
+            console.log(`Session exists: ${sessions.has(sessionId)}`);
+        } else {
+            console.log("No sessionId provided");
         }
-
-
-
-
-        const filePath = routes[req.url] || req.url.substring(1);
-        fs.readFile(path.join(__dirname, filePath), (err, data) => {
-            if (err) {
-                res.writeHead(404);
-                res.end('File not found');
-                return;
-            }
-            const ext = path.extname(filePath);
-            res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' });
-            res.end(data);
-        });
-        return;
+        
+        if (!sessionId || !sessions.has(sessionId)) {
+            console.log("Redirecting to login");
+            return res.redirect('/login');
+        }
     }
+    next();
+});
 
+// Maintain compatibility with old login endpoint
+app.post('/login', (req, res) => {
+    console.log('Legacy /login endpoint called, forwarding to /api/auth/login');
+    // Fixed the forwarding mechanism
+    req.url = '/api/auth/login';
+    app._router.handle(req, res);
+});
 
-
-
-    
-    if (req.method === 'POST') {
-        let body = '';
-        req.on('data', chunk => body += chunk);
-        req.on('end', () => {
-            if (req.url === '/signup') {
-                try {
-                    const { username, email, password } = JSON.parse(body);
-                    const users = readUsers();
-
-                    if (users[username]) {
-                        res.writeHead(409, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Username already exists' }));
-                        return;
-                    }
-
-                    users[username] = { email, password };
-                    writeUsers(users);
-
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: true }));
-                } catch (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Server error' }));
-                }
-                return;
-            }
-
-            if (req.url === '/login') {
-                try {
-                    const { username, password } = JSON.parse(body);
-                    const users = readUsers();
-
-                    if (!users[username] || users[username].password !== password) {
-                        res.writeHead(401, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Invalid credentials' }));
-                        return;
-                    }
-
-                    const sessionId = generateSessionId();
-                    sessions.set(sessionId, username);
-
-                    res.writeHead(200, {
-                        'Set-Cookie': `sessionId=${sessionId}; Path=/; HttpOnly`,
-                        'Content-Type': 'application/json'
-                    });
-                    res.end(JSON.stringify({ redirect: '/home' }));
-                } catch (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Server error' }));
-                }
-                return;
-            }
-
-            if (req.url === '/logout') {
-                try {
-                    const cookies = parseCookies(req.headers.cookie);
-                    const sessionId = cookies.sessionId;
-                    
-                    if (sessionId) {
-                        sessions.delete(sessionId);
-                    }
-            
-                    res.writeHead(200, {
-                        'Set-Cookie': 'sessionId=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
-                        'Content-Type': 'application/json'
-                    });
-                    res.end(JSON.stringify({ success: true }));
-                } catch (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Server error' }));
-                }
-                return;
-            }
-        });
-        return;
+// Add a logout endpoint for convenience
+app.get('/logout', (req, res) => {
+    console.log('Legacy /logout endpoint called');
+    const sessionId = req.cookies.sessionId;
+    if (sessionId) {
+        sessions.delete(sessionId);
+        res.clearCookie('sessionId');
     }
+    res.redirect('/login');
+});
 
-    // Example of handling a request from the client to your server, which forwards the request to the external API
-server.on('request', (req, res) => {
-    if (req.method === 'POST' && req.url === '/chatbot') {
-        let body = '';
-        req.on('data', chunk => body += chunk);
-        req.on('end', async () => {
-            try {
-                const requestBody = JSON.parse(body);
+// Maintain compatibility with old chatbot endpoint
+app.post('/chatbot', (req, res) => {
+    console.log('Legacy /chatbot endpoint called, forwarding to /api/chatbot');
+    req.url = '/api/chatbot';
+    app._router.handle(req, res);
+});
 
-                // Make the API request server-side using the API key
-                const response = await fetch('https://api.example.com/chatbot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`, // Add the API key here
-                    },
-                    body: JSON.stringify(requestBody),
-                });
-
-                const data = await response.json();
-
-                // Send the data back to the client
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify(data));
-            } catch (err) {
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Server error' }));
-            }
-        });
+// Catch-all route for static files
+app.get('*', (req, res) => {
+    const route = routes[req.path];
+    if (route) {
+        res.sendFile(path.join(__dirname, route));
+    } else {
+        res.status(404).send('Not Found');
     }
 });
 
-    res.writeHead(404);
-    res.end('Not found');
-});
+setupCustomerSockets(io);
 
-const PORT = process.env.PORT || 3000;  // Use PORT from environment variables or default to 3000
+// Start Server
+const PORT = process.env.PORT || 8081;
 server.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

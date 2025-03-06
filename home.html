@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechZen: Discover. Learn. Innovate.</title>
+    <script src="loader.js"></script>
+<script>
+    (function() {
+        initLoader('home');
+    })();
+</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -16,26 +22,37 @@
     <!-- Navbar -->
     <header class="nav-header">
         <center>
-            <div class="head" style="margin-right: 1000px;">
             </div>
     </center>
 
         <div class="nav-container" >
-            <nav class="nav-links">
+            <nav class="nav-links" style="margin-left: -90px;">
                 <div class="logo">
-                    <a href="/home"><img src="logo.jpeg" alt="logo" style="width: 100px; border-radius: 50%;"></a>
+                    <a href="/home"><img src="/img-vid/logo.jpeg" alt="logo" style="width: 100px; border-radius: 50%;"></a>
                 </div>
 
                 <button class="nav-btn" onclick="location.href='/news'">Tech News</button>
                 <button class="nav-btn" onclick="location.href='/gadgets'">Gadgets</button>
                 <button class="nav-btn" onclick="location.href='/ai'">AI Updates</button>
-                <button class="nav-btn" onclick="location.href='/reviews'">Reviews</button>
+                <button class="nav-btn" onclick="location.href='/blogs'">Blog</button>
                 <button class="nav-btn" onclick="location.href='/selling'">Sell/Buy</button>
 
 
                 <button class="nav-btn" onclick="location.href='/customer'">Tech Service</button>
-                <a href="/subscribe"><button class="subscribe-btn">Subscribe</button></a>                
+
+                
+
+                <!-- Add this to your navbar in home.html, just before the subscribe button -->
+<div class="user-profile">
+    <div id="username-display">
+        <i class="fas fa-user-circle"></i>
+        <span>Loading...</span>
+    </div>
+</div>
+
+                <!-- <a href="/subscribe"><button class="subscribe-btn">Subscribe</button></a>                 -->
                 <button class="logout-btn" onclick="logout()">Logout</button>
+
 
 
                               </nav>
@@ -69,32 +86,38 @@
     
     
 
-    <!-- Categories -->
+<!-- Categories -->
+<!-- Replace the existing Categories section with this -->
+<section class="categories-wrapper">
+    <div class="section-background"></div>
     <section class="categories">
         <h2>Explore Tech Topics</h2>
         <div class="category-grid">
-            <a href="ai.html" class="category-card">
+            <a href="/ai" class="category-card">
                 <img src="img-vid/ai.png" alt="AI Updates">
                 <h3>AI Updates</h3>
                 <p>Latest developments in artificial intelligence and machine learning</p>
             </a>
-            <a href="gadgets.html" class="category-card">
+            <a href="/gadgets" class="category-card">
                 <img src="img-vid/gadgets.png" alt="Gadget Reviews">
                 <h3>Gadget Reviews</h3>
                 <p>In-depth reviews of the latest tech gadgets and innovations</p>
             </a>
-            <a href="news.html" class="category-card">
-                <img style="margin-bottom: 100px; margin-top: 50px;" src="img-vid/tech.png" alt="Tech News">
+            <a href="/news" class="category-card">
+                <img src="img-vid/tech.png" alt="Tech News">
                 <h3>Tech News</h3>
                 <p>Breaking news and updates from the tech industry</p>
             </a>
-
         </div>
     </section>
+</section>
 
-    <div class="divider"></div>
+<div class="divider"></div>
 
     <!-- Latest News -->
+<!-- Replace the existing Latest News section with this -->
+<section class="news-wrapper">
+    <div class="section-background"></div>
     <section class="latest-news">
         <h2>Latest News</h2>
         <div class="news-grid">
@@ -127,6 +150,7 @@
             </div>
         </div>
     </section>
+</section>
 
     <div class="divider"></div>
 
@@ -171,79 +195,134 @@
 
     <script>
 
-
-
+// Add this to your existing script section
 document.addEventListener('DOMContentLoaded', function() {
-    // Hide all content initially
-    document.body.style.visibility = 'hidden';
-    
-    // Create and insert loader immediately
-    const loader = document.createElement('div');
-    loader.id = 'initialLoader';
-    loader.innerHTML = `
-        <div class="vortex">
-            <div class="time-tunnel" id="timeTunnel"></div>
-            <div class="welcome-message">
-                <h1>Welcome to TechZen</h1>
-                <p>Initiating Time Jump...</p>
-            </div>
-            <div class="time-particles" id="particles"></div>
-        </div>
-    `;
-    document.body.prepend(loader);
-    document.body.style.visibility = 'visible';
-    
-    // Create tunnel rings
-    const tunnel = document.getElementById('timeTunnel');
-    for (let i = 0; i < 20; i++) {
-        const ring = document.createElement('div');
-        ring.className = 'tunnel-ring';
-        ring.style.width = `${(i + 1) * 50}px`;
-        ring.style.height = `${(i + 1) * 50}px`;
-        ring.style.borderColor = `hsl(${180 + i * 10}, 100%, 50%)`;
-        ring.style.animation = `tunnelRing 2s infinite`;
-        ring.style.animationDelay = `${i * 0.1}s`;
-        tunnel.appendChild(ring);
-    }
-    
-    // Create particles
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 100; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = `${Math.random() * 100}%`;
-        particle.style.top = `${Math.random() * 100}%`;
-        particle.style.animationDelay = `${Math.random() * 2}s`;
-        particlesContainer.appendChild(particle);
-    }
-    
-    // Remove loader after animation
-    setTimeout(() => {
-        loader.style.transition = 'opacity 1s';
-        loader.style.opacity = '0';
-        setTimeout(() => loader.remove(), 1000);
-    }, 3000);
+    // Add subtle parallax effect to the background images
+    window.addEventListener('scroll', function() {
+        const scrollPosition = window.pageYOffset;
+        
+        // Apply parallax to categories background
+        const categoriesBackground = document.querySelector('.categories-wrapper .section-background');
+        if (categoriesBackground) {
+            categoriesBackground.style.transform = `translateY(${scrollPosition * 0.05}px)`;
+        }
+        
+        // Apply parallax to news background 
+        const newsBackground = document.querySelector('.news-wrapper .section-background');
+        if (newsBackground) {
+            newsBackground.style.transform = `translateY(${scrollPosition * 0.03}px)`;
+        }
+    });
 });
 
 
-async function logout() {
+
+// Add to your JavaScript in home.html
+document.addEventListener('DOMContentLoaded', function() {
+    // Make sure all news cards are visible
+    document.querySelectorAll('.news-card').forEach(card => {
+        card.style.opacity = '1';
+        card.style.transform = 'none';
+    });
+    
+    // Make sure all category cards are properly sized
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.style.opacity = '1';
+    });
+    
+    // Simpler hover effects for both card types
+    document.querySelectorAll('.category-card, .news-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+            card.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.5)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'none';
+            card.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+        });
+    });
+
+
+    fetchUsername();
+
+});
+
+
+
+// Replace your existing fetchUsername function with this one
+async function fetchUsername() {
+    const usernameDisplay = document.getElementById('username-display');
+    if (!usernameDisplay) {
+        console.error('Username display element not found');
+        return;
+    }
+
     try {
-        const response = await fetch('/logout', {
+        // Show loading indicator
+        usernameDisplay.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        
+        console.log('Fetching username from /api/user...');
+        const response = await fetch('/api/user');
+        console.log('Response status:', response.status);
+        
+        const userData = await response.json();
+        console.log('User data:', userData);
+        
+        if (response.ok && userData.username) {
+            // Get first letter for avatar
+            const firstLetter = userData.username.charAt(0).toUpperCase();
+            
+            // Display username with avatar
+            usernameDisplay.innerHTML = `
+                <div class="user-avatar">${firstLetter}</div>
+                <span>${userData.username}</span>
+                <i class="fas fa-user-astronaut"></i>
+            `;
+            
+            // Make user profile section visible
+            const userProfile = document.querySelector('.user-profile');
+            if (userProfile) {
+                userProfile.style.display = 'flex';
+            }
+        } else {
+            usernameDisplay.innerHTML = '<i class="fas fa-exclamation-circle"></i> Not logged in';
+            console.error('Login issue:', userData.error || 'Unknown error');
+        }
+    } catch (error) {
+        console.error('Error fetching username:', error);
+        usernameDisplay.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+    }
+}
+
+// Update your logout function with this implementation
+async function logout() {
+    console.log('Logout function called');
+    
+    try {
+        const response = await fetch('/api/auth/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include'
+            credentials: 'include' // Important for including cookies
         });
-
-        if (response.ok) {
-            window.location.href = '/login';
-        } else {
-            throw new Error('Logout failed');
-        }
+        
+        console.log('Logout response status:', response.status);
+        
+        // Clear any local storage items regardless of server response
+        localStorage.removeItem('sessionId');
+        localStorage.removeItem('username');
+        
+        const data = await response.json();
+        console.log('Logout response data:', data);
+        
+        // Force redirect to login page
+        window.location.href = '/login';
     } catch (error) {
         console.error('Logout error:', error);
-        alert('Failed to logout. Please try again.');
+        // Redirect anyway
+        window.location.href = '/login';
     }
 }
 
@@ -255,6 +334,7 @@ const navLinks = document.querySelector('.nav-links');
 
 mobileMenuBtn.addEventListener('click', () => {
     navLinks.classList.toggle('active');
+    console.log('Mobile menu toggled');
 });
 
 // Combined observer for both sections
@@ -283,6 +363,30 @@ const sectionObserver = new IntersectionObserver((entries, observer) => {
         }
     });
 }, sectionObserverOptions);
+
+
+document.querySelectorAll('.category-card').forEach(card => {
+    // Simple hover effect without intensive calculations
+    card.addEventListener('mouseenter', () => {
+        card.classList.add('glitch-active');
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.classList.remove('glitch-active');
+    });
+});
+
+// Replace the existing news card event listeners with this simpler version
+document.querySelectorAll('.news-card').forEach(card => {
+    // Simple hover effect without intensive calculations
+    card.addEventListener('mouseenter', () => {
+        card.classList.add('glitch-active');
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.classList.remove('glitch-active');
+    });
+});
 
 // Observe both sections
 document.querySelectorAll('.categories, .latest-news').forEach(section => {
@@ -367,55 +471,41 @@ document.addEventListener('DOMContentLoaded', () => {
     newsSection.init();
 });
 
-    document.querySelectorAll('.news-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const deltaX = (x - centerX) / centerX;
-        const deltaY = (y - centerY) / centerY;
-        
-        card.style.transform = `
-            perspective(1000px) 
-            rotateX(${deltaY * 10}deg) 
-            rotateY(${deltaX * 10}deg)
-            translateZ(20px)
-        `;
-    });
+// Enhanced navigation handler for both read-more links and nav buttons
+function setupNavigation() {
+    const navigationTargets = document.querySelectorAll('.read-more, .nav-btn');
     
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+    navigationTargets.forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            // Get the correct path, handling both read-more links and nav buttons
+            const path = link.getAttribute('href') || 
+                         link.getAttribute('onclick').match(/'([^']*)'/)[1].replace('/','');
+            
+            try {
+                // Check if user is authenticated by checking server session
+                const response = await fetch('/api/user');
+                
+                if (response.ok) {
+                    // If authenticated, navigate to the page
+                    window.location.href = path;
+                } else {
+                    // If not authenticated, redirect to login
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Navigation error:', error);
+                window.location.href = '/login';
+            }
+        });
     });
-});
+}
 
-    // Observe the categories section
-    const categoriesSection = document.querySelector('.categories');
-    observer.observe(categoriesSection);
+// Call the setup function when the document loads
+document.addEventListener('DOMContentLoaded', setupNavigation);
 
-
-    document.querySelectorAll('.category-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const deltaX = (x - centerX) / centerX;
-        const deltaY = (y - centerY) / centerY;
-        
-        card.style.transform = `perspective(1000px) rotateX(${deltaY * 10}deg) rotateY(${deltaX * 10}deg) translateZ(20px)`;
-    });
     
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
-    });
-});
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -499,6 +589,68 @@ document.querySelectorAll('.read-more').forEach(link => {
         }
     });
 });
+
+
+// User profile handling script
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch user profile information
+    fetch('/api/user')
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error('Not authenticated');
+            }
+        })
+        .then(data => {
+            // Update username display if element exists
+            const usernameElement = document.getElementById('username-display');
+            if (usernameElement) {
+                usernameElement.textContent = data.username || 'User';
+            }
+            
+            // Update any other user-related elements
+            const userEmailElement = document.getElementById('user-email');
+            if (userEmailElement && data.email) {
+                userEmailElement.textContent = data.email;
+            }
+            
+            console.log('User profile loaded:', data);
+        })
+        .catch(error => {
+            console.error('Error loading user profile:', error);
+        });
+    
+    // Handle logout if logout button exists
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login';
+                }
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+            });
+        });
+    }
+});
+
+
+
     </script>
+    <!-- Add this to your home.html before the closing </body> tag -->
+<script src="/public/js/userProfile.js"></script>
 </body>
 </html>

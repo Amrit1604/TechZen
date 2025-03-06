@@ -1,2 +1,0 @@
-1. add themes to all files like the news one
-2. add more items in home 

@@ -1,30 +1,77 @@
 const express = require('express');
 const http = require('http');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const socketIO = require('socket.io');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const setupCustomerSockets = require('./customer.js');
+const sellRouter = require('./sell.js');
 
+// // New middleware imports
+// const helmet = require('helmet');
+// const compression = require('compression');
+// const cors = require('cors');
 
-require('dotenv').config();  // Add this line to load .env variables
-const API_KEY = process.env.API_KEY;
-
-const USERS_FILE = path.join(__dirname, 'users.json');
-if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify({}));
-}
-
-
-const sessions = new Map();
+require('dotenv').config();
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 
 
 
+// app.use(helmet());
+
+// app.use(compression());
+
+// app.use(cors({
+//     origin: ['http://localhost:8081'],
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
+// const morgan = require('morgan');
+// app.use(morgan('combined'));
+
+// Mount the sell router at /api
+app.use('/api', sellRouter);
 
 
+
+// Middleware setup
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
+
+// Request logger middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
+// Global variables
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyDI8eJG4HqF60a6snvSRYFoXns-6QPQN38";
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const sessions = new Map();
+
+
+// Utility Functions
 function readUsers() {
     try {
-        return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        const usersFile = path.join(__dirname, 'users.json');
+        if (!fs.existsSync(usersFile)) {
+            fs.writeFileSync(usersFile, JSON.stringify({}));
+        }
+        return JSON.parse(fs.readFileSync(usersFile, 'utf8'));
     } catch (error) {
         console.error('Error reading users file:', error);
         return {};
@@ -33,231 +80,20 @@ function readUsers() {
 
 function writeUsers(users) {
     try {
-        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+        fs.writeFileSync(path.join(__dirname, 'users.json'), JSON.stringify(users, null, 2));
     } catch (error) {
         console.error('Error writing users file:', error);
     }
-}
-
-function parseCookies(cookieHeader) {
-    const cookies = {};
-    if (cookieHeader) {
-        cookieHeader.split(';').forEach(cookie => {
-            const [name, value] = cookie.split('=');
-            cookies[name.trim()] = value;
-        });
-    }
-    return cookies;
 }
 
 function generateSessionId() {
     return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
-const mimeTypes = {
-    '.html': 'text/html',
-    '.css': 'text/css',
-    '.js': 'text/javascript',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.mp4': 'video/mp4',
-    '.ico': 'image/x-icon',
-};
-
-const routes = {
-    '/': 'index.html',
-    '/login': 'login.html',
-    '/ContactUs' : 'ContactUs.html',
-    '/home': 'home.html',
-    '/ai': 'ai.html',
-    '/news': 'news.html',
-    '/gadgets': 'gadgets.html',
-    '/subscribe': 'subscribe.html',
-    '/blogs': 'blogs.html',
-    '/customer': 'customer.html',
-};
-
-const server = http.createServer((req, res) => {
-    if (req.method === 'GET') {
-        const cookies = parseCookies(req.headers.cookie);
-        const sessionId = cookies.sessionId;
-
-        if (['/home', '/ai', '/news', '/gadgets', '/subscribe' ,'/customer', '/blogs' ].includes(req.url)) {
-            if (!sessionId || !sessions.has(sessionId)) {
-                res.writeHead(302, { 'Location': '/login' });
-                res.end();
-                return;
-            }
-        }
-
-
-
-
-        const filePath = routes[req.url] || req.url.substring(1);
-        fs.readFile(path.join(__dirname, filePath), (err, data) => {
-            if (err) {
-                res.writeHead(404);
-                res.end('File not found');
-                return;
-            }
-            const ext = path.extname(filePath);
-            res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' });
-            res.end(data);
-        });
-        return;
-    }
-
-
-
-
-    
-    if (req.method === 'POST') {
-        let body = '';
-        req.on('data', chunk => body += chunk);
-        req.on('end', () => {
-            if (req.url === '/signup') {
-                try {
-                    const { username, email, password } = JSON.parse(body);
-                    const users = readUsers();
-
-                    if (users[username]) {
-                        res.writeHead(409, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Username already exists' }));
-                        return;
-                    }
-
-                    users[username] = { email, password };
-                    writeUsers(users);
-
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: true }));
-                } catch (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Server error' }));
-                }
-                return;
-            }
-
-            if (req.url === '/login') {
-                try {
-                    const { username, password } = JSON.parse(body);
-                    const users = readUsers();
-
-                    if (!users[username] || users[username].password !== password) {
-                        res.writeHead(401, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Invalid credentials' }));
-                        return;
-                    }
-
-                    const sessionId = generateSessionId();
-                    sessions.set(sessionId, username);
-
-                    res.writeHead(200, {
-                        'Set-Cookie': `sessionId=${sessionId}; Path=/; HttpOnly`,
-                        'Content-Type': 'application/json'
-                    });
-                    res.end(JSON.stringify({ redirect: '/home' }));
-                } catch (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Server error' }));
-                }
-                return;
-            }
-
-            if (req.url === '/logout') {
-                try {
-                    const cookies = parseCookies(req.headers.cookie);
-                    const sessionId = cookies.sessionId;
-                    
-                    if (sessionId) {
-                        sessions.delete(sessionId);
-                    }
-            
-                    res.writeHead(200, {
-                        'Set-Cookie': 'sessionId=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
-                        'Content-Type': 'application/json'
-                    });
-                    res.end(JSON.stringify({ success: true }));
-                } catch (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Server error' }));
-                }
-                return;
-            }
-        });
-        return;
-    }
-
-    // Example of handling a request from the client to your server, which forwards the request to the external API
-server.on('request', (req, res) => {
-    if (req.method === 'POST' && req.url === '/chatbot') {
-        let body = '';
-        req.on('data', chunk => body += chunk);
-        req.on('end', async () => {
-            try {
-                const requestBody = JSON.parse(body);
-
-                // Make the API request server-side using the API key
-                const response = await fetch('https://api.example.com/chatbot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`, // Add the API key here
-                    },
-                    body: JSON.stringify(requestBody),
-                });
-
-                const data = await response.json();
-
-                // Send the data back to the client
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify(data));
-            } catch (err) {
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Server error' }));
-            }
-        });
-    }
-});
-
-    res.writeHead(404);
-    res.end('Not found');
-});
-
-
-
-
-
-// CUSTOMER SERVICE ----------------------- 
-
-
-const io = socketIO(server);  // <-- Then pass the server to socket.io
-
-
-
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'customer.html'));
-});
-
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-// Store active chats and admin sessions
-const activeSessions = new Map();
-const adminSessions = new Map();
-const chatHistory = new Map();
-
-// Function to save user data to JSON file
 function saveUserData(userData) {
     const filePath = path.join(__dirname, 'userdata.json');
     let existingData = [];
     
-    // Read existing data if file exists
     if (fs.existsSync(filePath)) {
         try {
             const fileContent = fs.readFileSync(filePath, 'utf8');
@@ -267,14 +103,12 @@ function saveUserData(userData) {
         }
     }
 
-    // Add new user data with timestamp
     const newData = {
         ...userData,
         timestamp: new Date().toISOString()
     };
     existingData.push(newData);
 
-    // Write back to file
     try {
         fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
         console.log('User data saved successfully');
@@ -283,251 +117,157 @@ function saveUserData(userData) {
     }
 }
 
-// Handle admin connections
-io.of('/admin').on('connection', (socket) => {
-    console.log('Admin connected');
+// Static File Serving
+app.use(express.static(__dirname));
 
-    socket.on('adminLogin', (data) => {
-        console.log('Admin login attempt:', data);
-        // Store admin session
-        adminSessions.set(socket.id, {
-            adminId: data.adminId,
-            socket: socket
-        });
+// Routes
+const routes = {
+    '/': 'index.html',
+    '/login': 'login.html',
+    '/ContactUs': 'ContactUs.html',
+    '/home': 'home.html',
+    '/ai': 'ai.html',
+    '/news': 'news.html',
+    '/gadgets': 'gadget.html',
+    '/subscribe': 'subscribe.html',
+    '/blogs': 'blog.html',
+    '/customer': 'customer.html',
+    '/admin': 'admin1604.html',  // Add this line for admin route
+    '/chatbot': 'chatbot.html',
+    '/about': 'AboutUs.html',
+    '/selling': 'selling.html',
+};
+
+// Middleware to check authentication for protected routes
+const protectedRoutes = ['/home', '/ai', '/news', '/gadgets', '/subscribe', '/customer',  '/chatbot'];
+app.use((req, res, next) => {
+    if (protectedRoutes.includes(req.path)) {
+        const sessionId = req.cookies.sessionId;
+        console.log(`Route ${req.path} access attempted with sessionId: ${sessionId}`);
+        console.log(`Session exists: ${sessions.has(sessionId)}`);
         
-        socket.emit('adminAuthSuccess');
-        
-        // Send current customer list
-        const customerList = Array.from(activeSessions.values()).map(session => ({
-            id: session.customerId,
-            username: session.username,
-            email: session.email,
-            issue: session.issue,
-            status: session.status
-        }));
-        console.log('Sending customer list:', customerList);
-        socket.emit('customerList', customerList);
-    });
-
-    socket.on('joinCustomerChat', (data) => {
-        console.log('Admin joining customer chat:', data);
-        const session = activeSessions.get(data.customerId);
-        if (session) {
-            socket.join(data.customerId);
-            const history = chatHistory.get(data.customerId) || [];
-            socket.emit('chatHistory', { messages: history });
+        if (!sessionId || !sessions.has(sessionId)) {
+            return res.redirect('/login');
         }
-    });
-
-    socket.on('adminMessage', (data) => {
-        console.log('Admin message:', data);
-        const session = activeSessions.get(data.customerId);
-        if (session) {
-            const messageData = {
-                type: 'admin',
-                message: data.message,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Store in chat history
-            const history = chatHistory.get(data.customerId) || [];
-            history.push(messageData);
-            chatHistory.set(data.customerId, history);
-            
-            // Send to customer
-            io.to(data.customerId).emit('adminMessage', messageData);
-        }
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Admin disconnected');
-        adminSessions.delete(socket.id);
-    });
+    }
+    next();
 });
 
-// Customer socket handlers
-io.on('connection', (socket) => {
-    console.log('Customer connected');
 
-    socket.on('startCustomerChat', (data) => {
-        console.log('New customer chat:', data);
-        const customerId = socket.id;
-        if (!data.username || !data.email || !data.issue) {
-            console.error('Invalid data from customer:', data);
-            socket.emit('errorMessage', 'Invalid data provided.');
-            return;
+
+
+
+// Make sure uploads directory is served statically
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Ensure the uploads directory exists
+const uploadDir = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+// Then modify your signup route
+app.post('/signup', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+        const users = readUsers();
+
+        if (users[username]) {
+            return res.status(409).json({ error: 'Username already exists' });
         }
-        
-        // Save user data to JSON file
-        saveUserData({
-            customerId,
-            username: data.username,
-            email: data.email,
-            issue: data.issue
-        });
 
-        // Store session info
-        activeSessions.set(customerId, {
-            customerId,
-            username: data.username,
-            email: data.email,
-            issue: data.issue,
-            status: 'waiting',
-            socket: socket
-        });
-        
-        // Join customer to their room
-        socket.join(customerId);
-        
-        // Initialize chat history
-        chatHistory.set(customerId, []);
-        
-        // Update all admins
-        io.of('/admin').emit('customerList', Array.from(activeSessions.values()).map(session => ({
-            id: session.customerId,
-            username: session.username,
-            email: session.email,
-            issue: session.issue,
-            status: session.status
-        })));
-        
-        socket.emit('chatStatus', 'Connected to support. Please wait for an agent.');
-    });
+        // Hash password before storing
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        users[username] = { email, password: hashedPassword };
+        writeUsers(users);
 
-    socket.on('customerMessage', (data) => {
-        console.log('Customer message:', data);
-        const customerId = socket.id;
-        const session = activeSessions.get(customerId);
-        
-        if (session) {
-            const messageData = {
-                type: 'customer',
-                customerId,
-                username: data.username,
-                message: data.message,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Store in chat history
-            const history = chatHistory.get(customerId) || [];
-            history.push(messageData);
-            chatHistory.set(customerId, history);
-            
-            // Send to admins
-            io.of('/admin').emit('customerMessage', messageData);
-        }
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Customer disconnected');
-        const customerId = socket.id;
-        
-        // Clean up
-        activeSessions.delete(customerId);
-        chatHistory.delete(customerId);
-        
-        // Update admins
-        io.of('/admin').emit('customerList', Array.from(activeSessions.values()).map(session => ({
-            id: session.customerId,
-            username: session.username,
-            email: session.email,
-            issue: session.issue,
-            status: session.status
-        })));
-    });
-
-    // Add these event handlers to your server.js
-
-// In the customer socket handlers section:
-socket.on('issueResolved', (data) => {
-    const customerId = socket.id;
-    const session = activeSessions.get(customerId);
-    
-    if (session) {
-        // Update session status
-        session.status = 'resolved';
-        activeSessions.set(customerId, session);
-        
-        // Notify admin
-        io.of('/admin').emit('chatResolved', {
-            customerId,
-            username: data.username,
-            status: 'resolved'
-        });
-        
-        // Add to chat history
-        const history = chatHistory.get(customerId) || [];
-        history.push({
-            type: 'system',
-            message: 'Customer marked issue as resolved',
-            timestamp: new Date().toISOString()
-        });
-        chatHistory.set(customerId, history);
+        res.status(200).json({ success: true });
+    } catch (err) {
+        console.error('Signup error:', err);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
-socket.on('issueUnresolved', (data) => {
-    const customerId = socket.id;
-    const session = activeSessions.get(customerId);
-    
-    if (session) {
-        session.status = 'unresolved';
-        activeSessions.set(customerId, session);
+// And update your login route
+app.post(['/login', '/api/login'], (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const users = readUsers();
         
-        io.of('/admin').emit('chatUnresolved', {
-            customerId,
-            username: data.username,
-            status: 'unresolved'
-        });
-        
-        const history = chatHistory.get(customerId) || [];
-        history.push({
-            type: 'system',
-            message: 'Customer marked issue as unresolved',
-            timestamp: new Date().toISOString()
-        });
-        chatHistory.set(customerId, history);
-    }
-});
-
-socket.on('endCustomerChat', (data) => {
-    const customerId = socket.id;
-    const session = activeSessions.get(customerId);
-    
-    if (session) {
-        // Notify admin
-        io.of('/admin').emit('customerEndedChat', {
-            customerId,
-            username: data.username,
-            status: data.status
-        });
-        
-        // Add to chat history
-        const history = chatHistory.get(customerId) || [];
-        history.push({
-            type: 'system',
-            message: `Chat ended by customer (${data.status})`,
-            timestamp: new Date().toISOString()
-        });
-        
-        // Clean up if resolved
-        if (data.status === 'resolved') {
-            activeSessions.delete(customerId);
-            chatHistory.delete(customerId);
-            
-            // Update admin customer list
-            io.of('/admin').emit('customerList', Array.from(activeSessions.values()).map(session => ({
-                id: session.customerId,
-                username: session.username,
-                email: session.email,
-                issue: session.issue,
-                status: session.status
-            })));
+        // For development only - simple password check
+        if (!users[username] || users[username].password !== password) {
+            return res.status(401).json({ error: 'Invalid credentials' });
         }
+        
+        // Create and store session
+        const sessionId = generateSessionId();
+        sessions.set(sessionId, { username });
+        
+        res.cookie('sessionId', sessionId, { httpOnly: true, path: '/' });
+        res.status(200).json({ redirect: '/home' });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}); 
+
+app.get('/api/user', (req, res) => {
+    const sessionId = req.cookies.sessionId;
+    
+    if (sessionId && sessions.has(sessionId)) {
+        const sessionData = sessions.get(sessionId);
+        res.status(200).json({ 
+            username: sessionData.username || 'User'
+        });
+    } else {
+        res.status(401).json({ error: 'Not logged in' });
     }
 });
 
+app.post('/logout', (req, res) => {
+    const sessionId = req.cookies.sessionId;
+    
+    if (sessionId) {
+        sessions.delete(sessionId);
+    }
+
+    res.clearCookie('sessionId');
+    res.status(200).json({ success: true });
 });
 
-const PORT = process.env.PORT || 8081;  
+// Catch-all route for static files
+app.get('*', (req, res) => {
+    const route = routes[req.path];
+    if (route) {
+        res.sendFile(path.join(__dirname, route));
+    } else {
+        res.status(404).send('Not Found');
+    }
+});
+
+// Chatbot API
+app.post('/chatbot', async (req, res) => {
+    try {
+        const userPrompt = req.body.prompt || req.body.message;
+        
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent(userPrompt);
+        const response = result.response.text();
+        
+        res.status(200).json({ 
+            message: response,
+            success: true 
+        });
+    } catch (err) {
+        console.error('Error in chatbot API:', err);
+        res.status(500).json({ 
+            error: 'Failed to process request',
+            details: err.message 
+        });
+    }
+});
+
+setupCustomerSockets(io);
+
+// Start Server
+const PORT = process.env.PORT || 8081;
 server.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

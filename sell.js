@@ -4,23 +4,8 @@ const path = require('path');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const bodyParser = require('body-parser');
-const session = require('express-session');
 const bcrypt = require('bcryptjs');
-
-// Initialize express app
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Configure middleware
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-    secret: 'techzen-marketplace-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
-}));
+const router = express.Router();
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
@@ -61,6 +46,7 @@ async function ensureDirectories() {
     }
 }
 
+// Call this function when initializing the module
 ensureDirectories();
 
 // Data file paths
@@ -87,13 +73,22 @@ async function writeData(filePath, data) {
     await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
+// Auth middleware for protected routes
+function isAuthenticated(req, res, next) {
+    if (req.session && req.session.user) {
+        next();
+    } else {
+        res.status(401).json({ message: 'Unauthorized access' });
+    }
+}
+
 // Serve the main HTML page
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'selling.html'));
 });
 
 // Authentication endpoints
-app.post('/api/auth/signup', async (req, res) => {
+router.post('/auth/signup', async (req, res) => {
     try {
         const { name, email, password, accountType } = req.body;
 
@@ -142,7 +137,7 @@ app.post('/api/auth/signup', async (req, res) => {
     }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+router.post('/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -182,7 +177,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-app.post('/api/auth/logout', (req, res) => {
+router.post('/auth/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.status(500).json({ message: 'Could not log out' });
@@ -191,17 +186,8 @@ app.post('/api/auth/logout', (req, res) => {
     });
 });
 
-// Auth middleware for protected routes
-function isAuthenticated(req, res, next) {
-    if (req.session.user) {
-        next();
-    } else {
-        res.status(401).json({ message: 'Unauthorized access' });
-    }
-}
-
 // Product endpoints
-app.get('/api/products', async (req, res) => {
+router.get('/products', async (req, res) => {
     try {
         let products = await readData(PRODUCTS_FILE);
         
@@ -247,7 +233,7 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-app.get('/api/products/:id', async (req, res) => {
+router.get('/products/:id', async (req, res) => {
     try {
         const products = await readData(PRODUCTS_FILE);
         const product = products.find(p => p.id === req.params.id);
@@ -263,7 +249,7 @@ app.get('/api/products/:id', async (req, res) => {
     }
 });
 
-app.post('/api/products', isAuthenticated, upload.array('images', 5), async (req, res) => {
+router.post('/products', isAuthenticated, upload.array('images', 5), async (req, res) => {
     try {
         const { name, description, category, condition, price, quantity } = req.body;
         let seller;
@@ -324,7 +310,7 @@ app.post('/api/products', isAuthenticated, upload.array('images', 5), async (req
     }
 });
 
-app.put('/api/products/:id', isAuthenticated, upload.array('newImages', 5), async (req, res) => {
+router.put('/products/:id', isAuthenticated, upload.array('newImages', 5), async (req, res) => {
     try {
         const productId = req.params.id;
         const updates = req.body;
@@ -365,7 +351,7 @@ app.put('/api/products/:id', isAuthenticated, upload.array('newImages', 5), asyn
     }
 });
 
-app.delete('/api/products/:id', isAuthenticated, async (req, res) => {
+router.delete('/products/:id', isAuthenticated, async (req, res) => {
     try {
         const productId = req.params.id;
         const products = await readData(PRODUCTS_FILE);
@@ -406,7 +392,7 @@ app.delete('/api/products/:id', isAuthenticated, async (req, res) => {
 });
 
 // Order endpoints
-app.post('/api/orders', async (req, res) => {
+router.post('/orders', async (req, res) => {
     try {
         const orderData = req.body;
         
@@ -454,7 +440,7 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
-app.get('/api/orders', isAuthenticated, async (req, res) => {
+router.get('/orders', isAuthenticated, async (req, res) => {
     try {
         const userId = req.query.user || req.session.user.id;
         const status = req.query.status;
@@ -490,7 +476,7 @@ app.get('/api/orders', isAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/api/orders/:id/track', async (req, res) => {
+router.get('/orders/:id/track', async (req, res) => {
     try {
         const orderId = req.params.id;
         const orders = await readData(ORDERS_FILE);
@@ -547,19 +533,8 @@ app.get('/api/orders/:id/track', async (req, res) => {
     }
 });
 
-// Helper function to determine the current step of an order
-function getCurrentOrderStep(status) {
-    switch (status) {
-        case 'processing': return 'processing';
-        case 'shipped': return 'shipped';
-        case 'out-for-delivery': return 'out-for-delivery';
-        case 'delivered': return 'delivered';
-        default: return 'order-placed';
-    }
-}
-
 // Review endpoints
-app.post('/api/reviews', isAuthenticated, async (req, res) => {
+router.post('/reviews', isAuthenticated, async (req, res) => {
     try {
         const { orderId, rating, title, comment } = req.body;
         
@@ -609,8 +584,19 @@ app.post('/api/reviews', isAuthenticated, async (req, res) => {
     }
 });
 
-// Error handling
-app.use((err, req, res, next) => {
+// Helper function to determine the current step of an order
+function getCurrentOrderStep(status) {
+    switch (status) {
+        case 'processing': return 'processing';
+        case 'shipped': return 'shipped';
+        case 'out-for-delivery': return 'out-for-delivery';
+        case 'delivered': return 'delivered';
+        default: return 'order-placed';
+    }
+}
+
+// Error handling middleware for the router
+router.use((err, req, res, next) => {
     console.error(err);
     
     // Handle multer errors
@@ -624,7 +610,4 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: err.message || 'Something went wrong' });
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+module.exports = router;
