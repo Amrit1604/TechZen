@@ -14,5 +14,13 @@
   "test": {
     "email": "testuser@gmail.com",
     "password": "Test@123"
+  },
+  "Daaku": {
+    "email": "Dakkusingh234@gmail.com",
+    "password": "Daaku@123"
+  },
+  "aaryushi": {
+    "email": "aaryushi1588.be23@chitkara.edu.in",
+    "password": "Yoyoyo@123"
   }
 }

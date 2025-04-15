@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechZen: Discover. Learn. Innovate.</title>
-    <script src="/js/loader.js"></script>
+    <script src="loader.js"></script>
 <script>
     (function() {
         initLoader('home');
@@ -65,19 +65,13 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <video class="hero-video" autoplay loop muted>
-            <source src="img-vid/backvid3.mp4" type="video/mp4">
-        </video>
+        <canvas id="particles-canvas"></canvas>
         <div class="hero-overlay"></div>
-        <center>
         <div class="hero-content">
             <h1 class="hero-title">TechZen</h1>
             <p class="hero-subtitle">Discover. Learn. Innovate.</p>
-            <button> LET' GO !
-            </button>
-                 
+            <button>LET'S GO!</button>
         </div>
-    </center>
     </section>
     <div id="chatbot-container" style="max-width: 2000px; max-height: 1200px; " class="sticky-chat">
         <iframe src="/html/chatbot.html" width="1000px" id="chatbot-frame"  ></iframe>
@@ -194,6 +188,143 @@
     <script src="chatbot.js"></script>
 
     <script>
+
+
+window.addEventListener('load', function() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Particle settings
+            const particleCount = Math.min(Math.floor(window.innerWidth * 0.08), 150);
+            const particles = [];
+            const connectionDistance = 150;
+            const mouseRadius = 150;
+            
+            // Mouse position
+            let mouse = {
+                x: null,
+                y: null,
+                radius: mouseRadius
+            };
+            
+            window.addEventListener('mousemove', function(event) {
+                mouse.x = event.x;
+                mouse.y = event.y;
+            });
+            
+            window.addEventListener('mouseout', function() {
+                mouse.x = null;
+                mouse.y = null;
+            });
+            
+            // Create particles
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = (Math.random() - 0.5) * 0.8;
+                    this.speedY = (Math.random() - 0.5) * 0.8;
+                    this.color = `rgba(${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 100 + 155)}, 255, ${Math.random() * 0.5 + 0.5})`;
+                }
+                
+                update() {
+                    // Move particles
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    
+                    // Bounce off edges
+                    if (this.x > canvas.width || this.x < 0) {
+                        this.speedX = -this.speedX;
+                    }
+                    if (this.y > canvas.height || this.y < 0) {
+                        this.speedY = -this.speedY;
+                    }
+                    
+                    // Mouse repulsion
+                    if (mouse.x != null && mouse.y != null) {
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < mouse.radius) {
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const force = (mouse.radius - distance) / mouse.radius;
+                            
+                            const directionX = -forceDirectionX * force * 2;
+                            const directionY = -forceDirectionY * force * 2;
+                            
+                            this.speedX += directionX;
+                            this.speedY += directionY;
+                        }
+                    }
+                    
+                    // Speed limit
+                    this.speedX = Math.max(Math.min(this.speedX, 2), -2);
+                    this.speedY = Math.max(Math.min(this.speedY, 2), -2);
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+            }
+            
+            function init() {
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            
+            function connectParticles() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < connectionDistance) {
+                            const opacity = 1 - (distance / connectionDistance);
+                            ctx.strokeStyle = `rgba(100, 150, 255, ${opacity * 0.6})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                
+                connectParticles();
+                requestAnimationFrame(animate);
+            }
+            
+            init();
+            animate();
+        });
+
+        
 
 // Add this to your existing script section
 document.addEventListener('DOMContentLoaded', function() {

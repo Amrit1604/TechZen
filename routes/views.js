@@ -50,6 +50,10 @@ publicRoutes.get('/login', (req, res) => {
 }
 );
 
+publicRoutes.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public/html/admin1604.html'));
+});
+
 
 // Protected routes - auth required
 const protectedRoutes = express.Router();
@@ -91,9 +95,6 @@ protectedRoutes.get('/selling2', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public/html/selling2.html'));
 });
 
-protectedRoutes.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public/html/admin1604.html'));
-});
 
 
 
