@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Zen - Technology News</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Roboto:wght@500&display=swap");
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-text-color: #183b56;
+            --secondary-text-color: #577592;
+            --accent-color: #2294ed;
+            --accent-color-dark: #1d69a3;
+            --background-color: #f8fafc;
+            --card-bg-color: #ffffff;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            color: var(--primary-text-color);
+            background-color: var(--background-color);
+        }
+
+        p {
+            font-family: "Roboto", sans-serif;
+            color: var(--secondary-text-color);
+            line-height: 1.4rem;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin-inline: auto;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+
+        nav {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 99;
+            left: 0;
+            right: 0;
+        }
+
+        .main-nav {
+            justify-content: space-between;
+            padding-block: 15px;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.5rem;
+            color: var(--primary-text-color);
+        }
+
+        .company-logo span {
+            color: var(--accent-color);
+        }
+
+        .search-bar {
+            height: 40px;
+            gap: 8px;
+        }
+
+        .news-input {
+            width: 250px;
+            height: 100%;
+            padding-inline: 12px;
+            border-radius: 4px;
+            border: 2px solid #bbd0e2;
+            font-family: "Roboto", sans-serif;
+        }
+
+        .search-button {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 8px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+        }
+
+        .search-button:hover {
+            background-color: var(--accent-color-dark);
+        }
+
+        main {
+            padding-block: 20px;
+            margin-top: 80px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--accent-color);
+            border-radius: 25px;
+            background-color: transparent;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-family: "Poppins", sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background-color: rgba(34, 148, 237, 0.1);
+        }
+
+        .filter-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .section-title span {
+            color: var(--accent-color);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            min-height: 380px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+
+        .news-source {
+            display: flex;
+            justify-content: space-between;
+            margin-block: 15px;
+            font-size: 0.8rem;
+            color: var(--secondary-text-color);
+        }
+
+        .news-desc {
+            font-size: 0.9rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: rgba(34, 148, 237, 0.15);
+            color: var(--accent-color);
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+        }
+
+        .api-warning {
+            background-color: #ffedcc;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .main-nav {
+                flex-direction: column;
+                padding: 15px 0;
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .news-input {
+                width: 60%;
+            }
+
+            .filters {
+                justify-content: center;
+                padding: 0 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="main-nav container flex">
+            <a href="#" onclick="reload()" class="company-logo">
+                Tech<span>Zen</span>
+            </a>
+            <div class="search-bar flex">
+                <input id="search-text" type="text" class="news-input" placeholder="Search technology news...">
+                <button id="search-button" class="search-button">Search</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <h1 class="section-title">Tech<span>Zen</span> Chronicles</h1>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-category="all">All Chronicles</button>
+                <button class="filter-btn" data-category="AI">Artificial Intelligence</button>
+                <button class="filter-btn" data-category="Startups">Ventures & Startups</button>
+                <button class="filter-btn" data-category="Innovation">Innovations</button>
+                <button class="filter-btn" data-category="Research">Research</button>
+            </div>
+            
+            <div class="api-warning">
+                <p><strong>Note:</strong> To use this app with live data, you need to add your News API key in the code.</p>
+            </div>
+            
+            <div class="cards-container" id="cards-container">
+                <!-- Cards will be inserted here -->
+            </div>
+        </div>
+    </main>
+    
+    <template id="template-news-card">
+        <div class="card">
+            <div class="card-header">
+                <img src="https://via.placeholder.com/400x200" alt="news-image" id="news-img">
+            </div>
+            <div class="card-content">
+                <div class="category-tag" id="news-category">Category</div>
+                <h3 id="news-title">This is the Title</h3>
+                <div class="news-source">
+                    <span id="news-source-name">Source Name</span>
+                    <span id="news-date">Date</span>
+                </div>
+                <p class="news-desc" id="news-desc">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Recusandae saepe quis voluptatum quisquam vitae doloremque facilis molestias quae ratione cumque!</p>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // Insert your API key here
+        const API_KEY = "08aa64d2c8b241afbf10e47fe7146210";
+        const baseUrl = "https://newsapi.org/v2/everything?";
+        
+        // Define category to query mappings
+        const categoryQueries = {
+            "all": "technology",
+            "AI": "artificial intelligence",
+            "Startups": "tech startups",
+            "Innovation": "technology innovation",
+            "Research": "technology research"
+        };
+
+        // Sample data for demonstration
+        const sampleData = {
+            articles: [
+                {
+                    source: { name: "TechCrunch" },
+                    title: "OpenAI's new language model breaks performance records",
+                    description: "The latest AI model demonstrates unprecedented capabilities in understanding context, generating creative content, and solving complex reasoning tasks.",
+                    urlToImage: "/api/placeholder/400/200",
+                    publishedAt: "2025-04-02T09:45:00Z",
+                    url: "#",
+                    category: "AI"
+                },
+                {
+                    source: { name: "Wired" },
+                    title: "Quantum computing startup secures $120M in funding",
+                    description: "The startup aims to develop practical quantum computing applications for industries ranging from pharmaceuticals to logistics.",
+                    urlToImage: "/api/placeholder/400/200",
+                    publishedAt: "2025-04-03T14:30:00Z",
+                    url: "#",
+                    category: "Startups"
+                },
+                {
+                    source: { name: "MIT Technology Review" },
+                    title: "Breakthrough in flexible display technology enables new form factors",
+                    description: "Researchers have developed a display technology that maintains high resolution and color accuracy while being able to fold multiple times without damage.",
+                    urlToImage: "/api/placeholder/400/200",
+                    publishedAt: "2025-04-01T11:20:00Z",
+                    url: "#",
+                    category: "Innovation"
+                },
+                {
+                    source: { name: "Scientific American" },
+                    title: "New algorithm improves efficiency of machine learning models by 40%",
+                    description: "Computer scientists have discovered a method to significantly reduce computational requirements for training complex neural networks.",
+                    urlToImage: "/api/placeholder/400/200",
+                    publishedAt: "2025-04-04T10:15:00Z",
+                    url: "#",
+                    category: "Research"
+                },
+                {
+                    source: { name: "The Verge" },
+                    title: "Revolutionary brain-computer interface allows typing with thoughts",
+                    description: "The non-invasive device translates neural signals into text at speeds approaching conversational typing.",
+                    urlToImage: "/api/placeholder/400/200",
+                    publishedAt: "2025-04-02T16:40:00Z",
+                    url: "#",
+                    category: "Innovation"
+                },
+                {
+                    source: { name: "Financial Times" },
+                    title: "AI chip manufacturer raises $500M as demand surges",
+                    description: "The company specializes in energy-efficient processors designed specifically for machine learning workloads.",
+                    urlToImage: "/api/placeholder/400/200",
+                    publishedAt: "2025-04-03T08:25:00Z",
+                    url: "#",
+                    category: "Startups"
+                }
+            ]
+        };
+
+        // Keep track of current filter
+        let currentCategory = "all";
+        
+        // Initialize page
+        window.addEventListener("load", () => {
+            // Check if API key is valid and attempt to fetch real data
+            if (API_KEY && API_KEY !== "08aa64d2c8b241afbf10e47fe7146210") {
+                fetchNews(categoryQueries[currentCategory]);
+            } else {
+                // Otherwise use sample data
+                displayNewsByCategory(sampleData.articles, currentCategory);
+            }
+            
+            // Setup filter buttons
+            setupFilterButtons();
+        });
+
+        function reload() {
+            window.location.reload();
+        }
+
+        // Set up filter button event listeners
+        function setupFilterButtons() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                    
+                    // Get category from button
+                    currentCategory = button.getAttribute('data-category');
+                    
+                    // Fetch news for selected category
+                    if (API_KEY && API_KEY !== "08aa64d2c8b241afbf10e47fe7146210") {
+                        fetchNews(categoryQueries[currentCategory]);
+                    } else {
+                        // Use sample data with filtering
+                        displayNewsByCategory(sampleData.articles, currentCategory);
+                    }
+                });
+            });
+        }
+
+        // Display news filtered by category
+        function displayNewsByCategory(articles, category) {
+            if (category === "all") {
+                bindData(articles);
+            } else {
+                const filteredArticles = articles.filter(article => 
+                    article.category === category || 
+                    article.title.includes(category) || 
+                    article.description.includes(category)
+                );
+                bindData(filteredArticles.length > 0 ? filteredArticles : articles);
+            }
+        }
+
+        // Fetch news from API
+        async function fetchNews(query, page = 1) {
+            try {
+                // Build query parameters
+                const params = new URLSearchParams({
+                    q: query,
+                    apiKey: API_KEY,
+                    pageSize: 20,
+                    page: page,
+                    language: 'en',
+                    sortBy: 'publishedAt'
+                });
+                
+                const res = await fetch(`${baseUrl}${params}`);
+                if (!res.ok) {
+                    throw new Error(`API request failed with status ${res.status}`);
+                }
+                
+                const data = await res.json();
+                
+                // Add categories to articles based on content
+                const articlesWithCategories = data.articles.map(article => {
+                    let category = "all";
+                    
+                    const title = article.title.toLowerCase();
+                    const description = article.description?.toLowerCase() || "";
+                    
+                    if (title.includes("ai") || title.includes("artificial intelligence") || 
+                        description.includes("ai") || description.includes("artificial intelligence") ||
+                        title.includes("machine learning") || description.includes("machine learning")) {
+                        category = "AI";
+                    } else if (title.includes("startup") || title.includes("fund") || 
+                               description.includes("startup") || description.includes("fund") ||
+                               title.includes("venture") || description.includes("venture")) {
+                        category = "Startups";
+                    } else if (title.includes("innovat") || title.includes("new tech") || 
+                               description.includes("innovat") || description.includes("new tech")) {
+                        category = "Innovation";
+                    } else if (title.includes("research") || title.includes("study") || 
+                               description.includes("research") || description.includes("study")) {
+                        category = "Research";
+                    }
+                    
+                    return { ...article, category };
+                });
+                
+                // Display articles based on current category filter
+                displayNewsByCategory(articlesWithCategories, currentCategory);
+            } catch (error) {
+                console.error("Error fetching news:", error);
+                // Fall back to sample data
+                displayNewsByCategory(sampleData.articles, currentCategory);
+            }
+        }
+
+        // Bind data to card template
+        function bindData(articles) {
+            const cardsContainer = document.getElementById("cards-container");
+            const newsCardTemplate = document.getElementById("template-news-card");
+
+            cardsContainer.innerHTML = "";
+
+            articles.forEach((article) => {
+                if (!article.urlToImage) return;
+                const cardClone = newsCardTemplate.content.cloneNode(true);
+                fillDataInCard(cardClone, article);
+                cardsContainer.appendChild(cardClone);
+            });
+        }
+
+        // Fill card template with article data
+        function fillDataInCard(cardClone, article) {
+            const newsImg = cardClone.querySelector("#news-img");
+            const newsTitle = cardClone.querySelector("#news-title");
+            const newsSourceName = cardClone.querySelector("#news-source-name");
+            const newsDate = cardClone.querySelector("#news-date");
+            const newsDesc = cardClone.querySelector("#news-desc");
+            const newsCategory = cardClone.querySelector("#news-category");
+
+            newsImg.src = article.urlToImage;
+            newsTitle.textContent = article.title;
+            newsDesc.textContent = article.description || "No description available";
+            newsCategory.textContent = article.category || "Technology";
+
+            // Format date
+            const date = new Date(article.publishedAt);
+            newsDate.textContent = date.toLocaleDateString("en-US", {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            newsSourceName.textContent = article.source.name;
+
+            cardClone.firstElementChild.addEventListener("click", () => {
+                window.open(article.url, "_blank");
+            });
+        }
+
+        // Handle search
+        const searchButton = document.getElementById("search-button");
+        const searchText = document.getElementById("search-text");
+
+        searchButton.addEventListener("click", performSearch);
+        searchText.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                performSearch();
+            }
+        });
+
+        function performSearch() {
+            const query = searchText.value.trim();
+            if (!query) return;
+            
+            // Reset filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-category') === "all") {
+                    btn.classList.add('active');
+                }
+            });
+            
+            currentCategory = "all";
+            
+            if (API_KEY && API_KEY !== "08aa64d2c8b241afbf10e47fe7146210") {
+                fetchNews(query);
+            } else {
+                // Search in sample data
+                const filteredArticles = sampleData.articles.filter(article => 
+                    article.title.toLowerCase().includes(query.toLowerCase()) ||
+                    (article.description && article.description.toLowerCase().includes(query.toLowerCase()))
+                );
+                bindData(filteredArticles.length > 0 ? filteredArticles : sampleData.articles);
+            }
+        }
+    </script>
+</body>
+</html>

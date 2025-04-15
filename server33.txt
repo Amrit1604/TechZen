@@ -2,15 +2,12 @@ const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
 const socketIO = require('socket.io');
-const path = require('path');
 const fs = require('fs');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const path = require('path');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const sellRouter = require('./sell'); // Import the router module
+const setupCustomerSockets = require('./customer.js');
+const sellRouter = require('./sell.js');
 
 require('dotenv').config();
 
@@ -18,89 +15,20 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-// 1. CORS Middleware - Move it to the top for proper handling
-app.use(cors({
-    origin: ['http://localhost:8081', 'https://yourdomain.com'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true // Add this to allow cookies to be sent with requests
-}));
 
-// 2. Basic middleware setup - Remove duplicates
+// Mount the sell router at /api
+app.use('/api', sellRouter);
+
+// Middleware setup (correct order is important)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(session({
-    secret: 'techzen-marketplace-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { 
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        secure: false // Change to true if using HTTPS
-    }
-}));
 
-// 3. Security middleware
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
-            connectSrc: ["'self'", "ws://localhost:8081", "wss://yourdomain.com"], // Allow WebSocket connections
-            imgSrc: ["'self'", "data:", "blob:"] // Allow images from these sources
-        }
-    },
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
-}));
 
-// 4. Rate Limiting Middleware
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-app.use(limiter);
 
-// 5. Static file serving - Move before routes for better performance
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(__dirname));
-
-// 6. Request logger middleware
+// Request logger middleware
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
-});
-
-// 7. API Routes - Mount the sell router
-app.use('/api', sellRouter);
-
-// 8. Routes
-const routes = {
-    '/': 'index.html',
-    '/login': 'login.html',
-    '/ContactUs': 'ContactUs.html',
-    '/home': 'home.html',
-    '/ai': 'ai.html',
-    '/news': 'news.html',
-    '/gadgets': 'gadgets.html',
-    '/subscribe': 'subscribe.html',
-    '/blogs': 'blogs.html',
-    '/customer': 'customer.html',
-    '/chatbot': 'chatbot.html'
-};
-
-// 9. Middleware to check authentication for protected routes
-const protectedRoutes = ['/home', '/ai', '/news', '/gadgets', '/subscribe', '/customer', '/blogs', '/chatbot'];
-app.use((req, res, next) => {
-    if (protectedRoutes.includes(req.path)) {
-        const sessionId = req.cookies.sessionId;
-        if (!sessionId || !sessions.has(sessionId)) {
-            console.log(`Redirecting unauthenticated user from ${req.path} to /login`);
-            return res.redirect('/login');
-        }
-    }
     next();
 });
 
@@ -108,9 +36,46 @@ app.use((req, res, next) => {
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyDI8eJG4HqF60a6snvSRYFoXns-6QPQN38";
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const sessions = new Map();
-const activeSessions = new Map();
-const adminSessions = new Map();
-const chatHistory = new Map();
+
+
+const errorHandler = (err, req, res, next) => {
+    console.error(`${new Date().toISOString()} - Error:`, err.stack);
+    
+    // Determine status code (default to 500)
+    const statusCode = err.statusCode || 500;
+    
+    // Check if request accepts HTML
+    if (req.accepts('html')) {
+      res.status(statusCode);
+      // Render appropriate error page based on status code
+      if (statusCode === 404) {
+        return res.sendFile(path.join(__dirname, 'error404.html'));
+      } else {
+        return res.sendFile(path.join(__dirname, 'error500.html'));
+      }
+    }
+    
+    // If API request, return JSON
+    if (req.accepts('json')) {
+      return res.status(statusCode).json({ 
+        error: {
+          message: err.message || 'An unexpected error occurred',
+          status: statusCode
+        } 
+      });
+    }
+    
+    // Default plain text response
+    res.status(statusCode).type('txt').send(err.message || 'Internal Server Error');
+  };
+
+  // 404 middleware for routes not found
+const notFoundHandler = (req, res, next) => {
+    const err = new Error(`Not Found - ${req.originalUrl}`);
+    err.statusCode = 404;
+    next(err);
+  };
+
 
 // Utility Functions
 function readUsers() {
@@ -165,6 +130,55 @@ function saveUserData(userData) {
     }
 }
 
+// Static File Serving
+app.use(express.static(__dirname));
+
+// Routes
+const routes = {
+    '/': 'index.html',
+    '/login': 'login.html',
+    '/ContactUs': 'ContactUs.html',
+    '/home': 'home.html',
+    '/ai': 'ai.html',
+    '/news': 'news.html',
+    '/gadgets': 'gadget.html',
+    '/blogs': 'blog.html',
+    '/customer': 'customer.html',
+    '/admin': 'admin1604.html',  // Add this line for admin route
+    '/chatbot': 'chatbot.html',
+    '/AboutUs': 'AboutUs.html',
+    '/selling': 'selling.html',
+};
+
+// Middleware to check authentication for protected routes
+const protectedRoutes = ['/home', '/ai', '/news', '/gadgets', '/subscribe', '/customer',  '/chatbot'];
+app.use((req, res, next) => {
+    if (protectedRoutes.includes(req.path)) {
+        const sessionId = req.cookies.sessionId;
+        console.log(`Route ${req.path} access attempted with sessionId: ${sessionId}`);
+        console.log(`Session exists: ${sessions.has(sessionId)}`);
+        
+        if (!sessionId || !sessions.has(sessionId)) {
+            return res.redirect('/login');
+        }
+    }
+    next();
+    
+});
+
+
+
+
+
+// Make sure uploads directory is served statically
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Ensure the uploads directory exists
+const uploadDir = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 // Authentication Routes
 app.post('/signup', (req, res) => {
     try {
@@ -184,21 +198,28 @@ app.post('/signup', (req, res) => {
     }
 });
 
-app.post('/login', (req, res) => {
+// Update the login route to handle both paths
+app.post(['/login', '/api/login'], (req, res) => {
     try {
+        console.log('Login attempt:', req.body);
         const { username, password } = req.body;
         const users = readUsers();
-
+        
+        console.log('Users database:', users);
+        console.log('User exists?', !!users[username]);
+        
         if (!users[username] || users[username].password !== password) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
         const sessionId = generateSessionId();
         sessions.set(sessionId, { username });
-
+        console.log('Session created:', sessionId);
+        
         res.cookie('sessionId', sessionId, { httpOnly: true, path: '/' });
         res.status(200).json({ redirect: '/home' });
     } catch (err) {
+        console.error('Login error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
@@ -227,8 +248,17 @@ app.post('/logout', (req, res) => {
     res.status(200).json({ success: true });
 });
 
-// Chatbot API
-app.post('/chatbot', async (req, res) => {
+app.get('*', (req, res, next) => {
+    const route = routes[req.path];
+    if (route) {
+        res.sendFile(path.join(__dirname, route));
+    } else {
+        next(); // Pass to 404 handler
+    }
+});
+
+// API Routes (keep these before error handlers)
+app.post('/chatbot', async (req, res, next) => {
     try {
         const userPrompt = req.body.prompt || req.body.message;
         
@@ -241,177 +271,15 @@ app.post('/chatbot', async (req, res) => {
             success: true 
         });
     } catch (err) {
-        console.error('Error in chatbot API:', err);
-        res.status(500).json({ 
-            error: 'Failed to process request',
-            details: err.message 
-        });
+        next(err); // Pass errors to error handler
     }
 });
 
-// Catch-all route for static files - Place after all other routes
-app.get('*', (req, res) => {
-    const route = routes[req.path];
-    if (route) {
-        res.sendFile(path.join(__dirname, route));
-    } else {
-        res.status(404).send('Not Found');
-    }
-});
+// Error handling (add these at the end, after all routes)
+app.use(notFoundHandler); // 404 handler for routes not defined
+app.use(errorHandler);    // Global error handler
 
-
-// Customer Support Socket Handlers
-io.of('/admin').on('connection', (socket) => {
-    console.log('Admin connected');
-
-    socket.on('adminLogin', (data) => {
-        adminSessions.set(socket.id, {
-            adminId: data.adminId,
-            socket: socket
-        });
-        
-        socket.emit('adminAuthSuccess');
-        
-        const customerList = Array.from(activeSessions.values()).map(session => ({
-            id: session.customerId,
-            username: session.username,
-            email: session.email,
-            issue: session.issue,
-            status: session.status
-        }));
-        socket.emit('customerList', customerList);
-    });
-
-    socket.on('joinCustomerChat', (data) => {
-        const session = activeSessions.get(data.customerId);
-        if (session) {
-            socket.join(data.customerId);
-            const history = chatHistory.get(data.customerId) || [];
-            socket.emit('chatHistory', { messages: history });
-        }
-    });
-
-    socket.on('adminMessage', (data) => {
-        const session = activeSessions.get(data.customerId);
-        if (session) {
-            const messageData = {
-                type: 'admin',
-                message: data.message,
-                timestamp: new Date().toISOString()
-            };
-            
-            const history = chatHistory.get(data.customerId) || [];
-            history.push(messageData);
-            chatHistory.set(data.customerId, history);
-            
-            io.to(data.customerId).emit('adminMessage', messageData);
-        }
-    });
-
-    socket.on('disconnect', () => {
-        adminSessions.delete(socket.id);
-    });
-});
-
-// Customer Socket Handlers
-io.on('connection', (socket) => {
-    socket.on('startCustomerChat', (data) => {
-        const customerId = socket.id;
-        if (!data.username || !data.email || !data.issue) {
-            socket.emit('errorMessage', 'Invalid data provided.');
-            return;
-        }
-        
-        saveUserData({
-            customerId,
-            username: data.username,
-            email: data.email,
-            issue: data.issue
-        });
-
-        activeSessions.set(customerId, {
-            customerId,
-            username: data.username,
-            email: data.email,
-            issue: data.issue,
-            status: 'waiting',
-            socket: socket
-        });
-        
-        socket.join(customerId);
-        chatHistory.set(customerId, []);
-        
-        io.of('/admin').emit('customerList', Array.from(activeSessions.values()).map(session => ({
-            id: session.customerId,
-            username: session.username,
-            email: session.email,
-            issue: session.issue,
-            status: session.status
-        })));
-        
-        socket.emit('chatStatus', 'Connected to support. Please wait for an agent.');
-    });
-
-    socket.on('customerMessage', (data) => {
-        const customerId = socket.id;
-        const session = activeSessions.get(customerId);
-        
-        if (session) {
-            const messageData = {
-                type: 'customer',
-                customerId,
-                username: data.username,
-                message: data.message,
-                timestamp: new Date().toISOString()
-            };
-            
-            const history = chatHistory.get(customerId) || [];
-            history.push(messageData);
-            chatHistory.set(customerId, history);
-            
-            io.of('/admin').emit('customerMessage', messageData);
-        }
-    });
-
-    socket.on('issueResolved', (data) => {
-        const customerId = socket.id;
-        const session = activeSessions.get(customerId);
-        
-        if (session) {
-            session.status = 'resolved';
-            activeSessions.set(customerId, session);
-            
-            io.of('/admin').emit('chatResolved', {
-                customerId,
-                username: data.username,
-                status: 'resolved'
-            });
-            
-            const history = chatHistory.get(customerId) || [];
-            history.push({
-                type: 'system',
-                message: 'Customer marked issue as resolved',
-                timestamp: new Date().toISOString()
-            });
-            chatHistory.set(customerId, history);
-        }
-    });
-
-    socket.on('disconnect', () => {
-        const customerId = socket.id;
-        
-        activeSessions.delete(customerId);
-        chatHistory.delete(customerId);
-        
-        io.of('/admin').emit('customerList', Array.from(activeSessions.values()).map(session => ({
-            id: session.customerId,
-            username: session.username,
-            email: session.email,
-            issue: session.issue,
-            status: session.status
-        })));
-    });
-});
+setupCustomerSockets(io);
 
 // Start Server
 const PORT = process.env.PORT || 8081;

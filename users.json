@@ -1,11 +1,18 @@
 {
-  "_lastCheck": "2025-03-06T09:14:26.147Z",
+  "testuser": {
+    "email": "testuser@gmail.com",
+    "password": "Test@123"
+  },
   "Amrit": {
     "email": "amritjoshi2004@gmail.com",
     "password": "Amrit@123"
   },
-  "Daaku": {
-    "email": "Dakkusingh234@gmail.com",
-    "password": "Daaku@123"
+  "Hero": {
+    "email": "hero@gmail.com",
+    "password": "Hero@123"
+  },
+  "test": {
+    "email": "testuser@gmail.com",
+    "password": "Test@123"
   }
 }
