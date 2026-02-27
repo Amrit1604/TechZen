@@ -5,3 +5,5 @@ data/sessions.json
 public/uploads/
 frontend/node_modules/
 frontend/dist/
+users.json
+userdata.json
