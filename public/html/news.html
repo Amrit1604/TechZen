@@ -285,7 +285,7 @@ async function fetchNews(query, isNewSearch = false) {
                     description: "A promising new tech startup has secured significant funding to develop energy-efficient computing solutions for data centers worldwide.",
                     date: "2024-12-20T00:00:00Z",
                     category: "Startups",
-                    image: "/api/placeholder/400/200",
+                    image: "https://placehold.co/400x200/1a1a2e/ffffff?text=TechZen",
                     url: "#"
                 },
                 {
@@ -293,7 +293,7 @@ async function fetchNews(query, isNewSearch = false) {
                     description: "Researchers have achieved stable quantum bits at room temperature, potentially bringing quantum computing closer to commercial reality.",
                     date: "2024-12-18T00:00:00Z",
                     category: "Research",
-                    image: "/api/placeholder/400/200",
+                    image: "https://placehold.co/400x200/1a1a2e/ffffff?text=TechZen",
                     url: "#"
                 },
                 {
@@ -301,7 +301,7 @@ async function fetchNews(query, isNewSearch = false) {
                     description: "A new innovation in E-Ink technology brings full color capabilities while maintaining the low power consumption that makes these displays popular.",
                     date: "2024-12-22T00:00:00Z",
                     category: "Innovation",
-                    image: "/api/placeholder/400/200",
+                    image: "https://placehold.co/400x200/1a1a2e/ffffff?text=TechZen",
                     url: "#"
                 },
                 {
@@ -309,7 +309,7 @@ async function fetchNews(query, isNewSearch = false) {
                     description: "New compression techniques allow sophisticated AI models to run directly on smartphones without cloud connectivity.",
                     date: "2024-12-19T00:00:00Z",
                     category: "AI",
-                    image: "/api/placeholder/400/200",
+                    image: "https://placehold.co/400x200/1a1a2e/ffffff?text=TechZen",
                     url: "#"
                 }
             ];
@@ -325,7 +325,7 @@ async function fetchNews(query, isNewSearch = false) {
             card.classList.add("blog-card");
 
             card.innerHTML = `
-                <img src="${article.image || '/api/placeholder/400/200'}" alt="${article.title}" onerror="this.src='/api/placeholder/400/200'">
+                <img src="${article.image || 'https://placehold.co/400x200/1a1a2e/ffffff?text=TechZen'}" alt="${article.title}" onerror="this.src='https://placehold.co/400x200/1a1a2e/ffffff?text=TechZen'">
                 <div class="card-content">
                     <span class="category-tag">${article.category}</span>
                     <h3>${article.title}</h3>
@@ -353,7 +353,7 @@ function bindData(isNewSearch = false) {
 
     // Create and append cards
     articles.forEach(article => {
-        if (!article.image) article.image = '/api/placeholder/400/200'; // Fallback image
+        if (!article.image) article.image = 'https://placehold.co/400x200/1a1a2e/ffffff?text=TechZen'; // Fallback image
         const card = createCard(article);
         cardsContainer.appendChild(card);
     });

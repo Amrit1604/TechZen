@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 // Import middleware
@@ -34,6 +35,12 @@ const { notFoundHandler, errorHandler } = require('./middleware/errorHandlers');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+
+// CORS configuration for React frontend
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 
 // Apply middleware (in correct order)
 setupBodyParsers(app);
